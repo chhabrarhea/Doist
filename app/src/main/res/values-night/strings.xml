@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_recording">Start Recording</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="stop_audio">Stop Audio</string>
+    <string name="play_audio">Play Audio</string>
+</resources>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+<data>
+    <variable
+        name="sharedVM"
+        type="com.example.todo.fragments.SharedViewModel" />
+</data>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/listLayout"
+    tools:context=".fragments.list.ListFragment">
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="?attr/actionBarSize"
+        android:id="@+id/recyclerView"/>
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:backgroundTint="@color/primaryDarkColor"
+        android:id="@+id/toolbar"
+        app:fabAlignmentMode="end"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/toolbar"
+        android:id="@+id/menuButton"
+        app:fabSize="normal"
+        app:pressedTranslationZ="12dp"
+        app:fab_showShadow="false"
+        android:src="@drawable/ic_add"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="90dp"
+        android:layout_marginEnd="42dp"
+        android:layout_below="@id/addNote"
+        android:id="@+id/addList"
+        app:backgroundTint="@color/secondaryColor"
+        android:visibility="invisible"
+        android:navigateToAddFragment="@{true}"
+        android:src="@drawable/ic_baseline_format_list_bulleted_24"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="138dp"
+            android:layout_marginEnd="42dp"
+            android:layout_gravity="bottom|end"
+            app:backgroundTint="@color/secondaryColor"
+            android:visibility="invisible"
+            android:navigateToCheckListFragment="@{true}"
+            app:fabSize="mini"
+            android:src="@drawable/ic_baseline_note_add_24"
+            />
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

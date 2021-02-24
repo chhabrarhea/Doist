@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.add.AddFragment">
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/toolbar"
+            app:title="Add a ToDo"
+            app:titleTextColor="?attr/colorControlNormal"
+            android:background="@color/primaryDarkColor"
+            android:fitsSystemWindows="true"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="24dp"
+                tools:ignore="UselessParent">
+                <EditText
+                    android:id="@+id/title_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:background="@android:color/transparent"
+                    android:paddingVertical="10dp"
+                    android:hint="@string/title"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/design_default_color_on_secondary"
+                    android:textStyle="bold"
+                    android:importantForAutofill="no" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="23dp"
+                    android:layout_marginTop="4dp"
+                    android:textStyle="italic"
+                    android:getCurrentTime="@{true}"
+                    android:layout_below="@id/title_et"
+                    android:id="@+id/time_text"/>
+                <org.angmarch.views.NiceSpinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:setList="@{true}"
+                    android:id="@+id/priorities_spinner"
+                    android:layout_below="@id/time_text" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/image"
+                    android:visibility="gone"
+                    android:padding="0dp"
+                    tools:visibility="visible"
+                    tools:layout_width="match_parent"
+                    tools:layout_height="100dp"
+                    tools:background="@color/primaryDarkColor"
+                    android:adjustViewBounds="true"
+                    android:layout_below="@id/priorities_spinner"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@string/noteimage" />
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fabSize="mini"
+                    tools:visibility="visible"
+                    android:layout_below="@id/priorities_spinner"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="5dp"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_baseline_delete_24"
+                    android:id="@+id/deleteImage"
+                    android:elevation="10dp"
+                    android:contentDescription="@string/delete_image" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="18sp"
+                    android:id="@+id/url_text"
+                    android:autoLink="web"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="italic"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:layout_toStartOf="@id/deleteUrl"
+                    android:layout_below="@id/image"
+                    android:drawablePadding="10dp"
+                    android:textSize="16sp"
+                    app:drawableLeftCompat="@drawable/ic_url"
+                    app:drawableTint="@color/secondaryDarkColor"
+                    android:importantForAutofill="no" />
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/image"
+                    app:fabSize="mini"
+                    tools:visibility="visible"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_baseline_delete_24"
+                    android:id="@+id/deleteUrl"
+                    android:contentDescription="@string/delete_url" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/mediaPlayer"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/media_player_background"
+                    android:layout_below="@id/url_text"
+                    >
+                    <TextView
+                        android:id="@+id/tv_pass"
+                        android:layout_width="wrap_content"
+                        android:text="0 secs"
+                        android:layout_toEndOf="@id/playButton"
+                        android:layout_marginHorizontal="14dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tv_due"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/tv_pass"
+                        android:textAlignment="textEnd"
+                        android:layout_toStartOf="@id/deleteAudio"
+                        android:layout_marginHorizontal="8dp" />
+                    <SeekBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/playButton"
+                        android:layout_below="@id/tv_pass"
+                        android:layout_toStartOf="@id/deleteAudio"
+                        android:layout_marginHorizontal="5dp"
+                        android:id="@+id/seek_bar"/>
+
+                    <ImageButton
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:scaleType="fitCenter"
+                        android:layout_centerVertical="true"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/avd_play_to_pause"
+                        android:id="@+id/playButton" />
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_baseline_delete_24"
+                        android:tint="@color/darkGray"
+                        android:layout_alignParentEnd="true"
+                        android:padding="15dp"
+                        android:contentDescription="@string/delete_audio"
+                        android:id="@+id/deleteAudio"/>
+                </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/mediaPlayer">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/priority_indicator"
+                        android:layout_width="6dp"
+                        android:layout_height="match_parent"
+                        app:cardCornerRadius="20dp"
+                        />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/description1"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="10dp"
+                    android:id="@+id/description_et"
+                    android:paddingVertical="15dp"
+                    android:importantForAutofill="no" />
+
+            </LinearLayout>
+
+
+
+
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+    </RelativeLayout>
+</layout>

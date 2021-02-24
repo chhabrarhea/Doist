@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop = "-10dp"
+            android:layout_marginEnd = "-5dp"
+            android:layout_alignParentStart="true"
+            android:id="@+id/item_checkBox"
+            style="@style/CustomCheckbox02"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_tv"
+        android:clickable="false"
+        android:longClickable="false"
+        android:layout_centerVertical="true"
+        android:textSize="18sp"
+        android:layout_marginEnd="10dp"
+        android:textColor="@color/darkGray"
+        android:layout_toEndOf="@id/item_checkBox"/>
+
+
+
+
+</RelativeLayout>
+</layout>

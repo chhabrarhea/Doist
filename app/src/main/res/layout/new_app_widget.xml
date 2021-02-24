@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView android:layout_width="match_parent"
+            android:id="@+id/widgetTitleLabel"
+            android:text="Doist"
+            android:textColor="@color/white"
+            android:background="@color/primaryDarkColor"
+            android:textSize="18dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:gravity="center"
+            android:layout_height="40dp"/>
+    </FrameLayout>
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ListView android:id="@+id/widgetListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:dividerHeight="1dp"
+            android:divider="#eeeeee"
+            tools:listitem="@layout/collection_widget_list_item"/>
+    </LinearLayout>
+</LinearLayout>

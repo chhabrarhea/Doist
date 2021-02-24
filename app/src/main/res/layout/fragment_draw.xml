@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.draw.DrawFragment">
+
+   <com.example.todo.fragments.draw.DrawingView
+       android:id="@+id/canvas"
+       android:layout_marginHorizontal="5dp"
+       android:layout_marginTop="5dp"
+       android:background="@drawable/media_player_background"
+       android:layout_height="wrap_content"
+       android:layout_marginBottom="56dp"
+       app:layout_anchorGravity="top"
+       android:layout_width="match_parent"
+
+      />
+
+  <androidx.cardview.widget.CardView
+      android:layout_width="match_parent"
+     android:id="@+id/bottomSheet"
+      app:behavior_hideable="false"
+      app:cardCornerRadius="15dp"
+      app:cardBackgroundColor="#E4E8E5"
+      app:behavior_peekHeight="56dp"
+      android:paddingVertical="5dp"
+      android:layout_height="wrap_content"
+     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+      <RelativeLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+     <RelativeLayout
+         android:layout_width="match_parent"
+         android:id="@+id/peek"
+         android:layout_centerHorizontal="true"
+         android:layout_height="56dp">
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="Brush Style"
+             android:layout_centerInParent="true"
+             android:textAlignment="center"
+             android:textColor="#000"
+             android:textSize="16sp"
+             android:fontFamily="@font/poppins_semibold"/>
+
+     </RelativeLayout>
+<include layout="@layout/bottom_sheet"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_below="@id/peek"
+    android:id="@+id/detail"/>
+      </RelativeLayout>
+  </androidx.cardview.widget.CardView>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
