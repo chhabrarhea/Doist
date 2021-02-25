@@ -31,14 +31,12 @@ private var prevStroke:RelativeLayout?=null
         initStrokeOptions()
         initColorOptions()
         binding.detail.eraser.setOnClickListener{
-            binding.canvas.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-            binding.canvas.setErase(true)
+            binding.canvas.onEraser()
             binding.detail.pen.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.white))
             binding.detail.eraser.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.secondaryColor))
         }
         binding.detail.pen.setOnClickListener{
-            binding.canvas.setErase(false)
-            binding.canvas.setBrushColor(prevColor!!.cardBackgroundColor.defaultColor)
+            binding.canvas.onEraser()
             binding.detail.pen.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.secondaryColor))
             binding.detail.eraser.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.white))
         }

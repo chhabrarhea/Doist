@@ -3,7 +3,6 @@ package com.example.todo.fragments.draw
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
@@ -50,6 +49,8 @@ class DrawingView(context: Context, attr: AttributeSet): View(context, attr) {
             drawPaint!!.color=path.color
             drawPaint!!.strokeWidth=path.brushThickness
             canvas.drawPath(path, drawPaint!!)
+
+
         }
         if (!drawPath!!.isEmpty){
             drawPaint!!.color=drawPath!!.color
@@ -71,26 +72,38 @@ class DrawingView(context: Context, attr: AttributeSet): View(context, attr) {
         }
     }
 
-    fun setErase(e: Boolean){
-        erase=e
-        if(erase){
-           }
-        else {drawPaint!!.xfermode = null}
+    fun remove(i: Int){
+        paths.removeAt(i)
+        invalidate()
 
     }
-
+    fun onEraser() {
+        erase = !erase
+    }
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         val touchX=event?.x
         val touchY=event?.y
+        if(erase){
+            for (i in paths.indices) {
+                val r = RectF()
+                val pComp = Point(
+                    event!!.x.toInt(),
+                    event.y.toInt()
+                )
+                val mPath: Path = paths[i]
+                mPath.computeBounds(r, true)
+                if (r.contains(pComp.x.toFloat(), pComp.y.toFloat())) {
+                    remove(i)
+                    break
+                }
+            }
+            return false
+        }
         when(event?.action){
             MotionEvent.ACTION_DOWN -> {
                 drawPath!!.color = color
                 drawPath!!.brushThickness = brushSize
 // Clear any lines and curves from the path, making it empty. This does NOT change the fill-type setting.
-               if (erase){
-                   drawPaint!!.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-                   drawPaint!!.color=Color.parseColor("#e2e2e2")
-               }
                 drawPath!!.reset()
                 drawPath!!.moveTo(touchX!!, touchY!!)
             }
