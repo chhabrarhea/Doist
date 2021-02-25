@@ -45,7 +45,6 @@ class MyWidgetRemoteViewsFactory(private val mContext: Context, intent: Intent?)
         rv.removeAllViews(R.id.container)
         if (list[p0].checklist!=null && list[p0].checklist!!.size>0){
             for(checklist in list[p0].checklist!!){
-                Log.i("hhj", checklist.task)
                 val view=RemoteViews(mContext.packageName, R.layout.widget_checklist)
                 view.setTextViewText(R.id.list_item, checklist.task)
                 if(checklist.done){

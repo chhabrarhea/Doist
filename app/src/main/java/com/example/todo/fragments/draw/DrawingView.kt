@@ -3,11 +3,13 @@ package com.example.todo.fragments.draw
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 
-class DrawingView(context: Context,attr:AttributeSet): View(context,attr) {
+
+class DrawingView(context: Context, attr: AttributeSet): View(context, attr) {
     private var drawPath:CustomDrawPath?=null
     private var canvasBitmap:Bitmap?=null
     private var drawPaint: Paint?=null
@@ -15,11 +17,13 @@ class DrawingView(context: Context,attr:AttributeSet): View(context,attr) {
     private var brushSize=10.toFloat()
     private var color=Color.BLACK
     private var canvas:Canvas?=null
+    private var erase = false
     private val paths=ArrayList<CustomDrawPath>()
+    private val undoPaths=ArrayList<CustomDrawPath>()
 
     init {
         drawPaint= Paint()
-        drawPath=CustomDrawPath(color,brushSize)
+        drawPath=CustomDrawPath(color, brushSize)
         drawPaint!!.color=color
         drawPaint!!.strokeJoin=Paint.Join.ROUND
         drawPaint!!.style=Paint.Style.STROKE
@@ -30,41 +34,74 @@ class DrawingView(context: Context,attr:AttributeSet): View(context,attr) {
 //    ARGB_8888- Each pixel is stored on 4 bytes.
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        canvasBitmap= Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888)
+        canvasBitmap= Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         canvas= Canvas(canvasBitmap!!)
+    }
+
+    private fun clearBrushes() {
+        paths.clear()
+        undoPaths.clear()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawBitmap(canvasBitmap!!,0f,0f,canvasPaint)
+        canvas.drawBitmap(canvasBitmap!!, 0f, 0f, canvasPaint)
         for(path in paths){
             drawPaint!!.color=path.color
             drawPaint!!.strokeWidth=path.brushThickness
-            canvas.drawPath(path,drawPaint!!)
+            canvas.drawPath(path, drawPaint!!)
         }
         if (!drawPath!!.isEmpty){
             drawPaint!!.color=drawPath!!.color
             drawPaint!!.strokeWidth=drawPath!!.brushThickness
-        canvas.drawPath(drawPath!!,drawPaint!!)}
+        canvas.drawPath(drawPath!!, drawPaint!!)}
+    }
+
+    fun undoPath(){
+        if(paths.size>0){
+            undoPaths.add(paths.removeAt(paths.size - 1))
+            invalidate()
+        }
+    }
+
+    fun redoPath(){
+        if(undoPaths.size>0){
+            paths.add(undoPaths.removeAt(undoPaths.size - 1))
+            invalidate()
+        }
+    }
+
+    fun setErase(e: Boolean){
+        erase=e
+        if(erase){
+           }
+        else {drawPaint!!.xfermode = null}
+
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         val touchX=event?.x
         val touchY=event?.y
         when(event?.action){
-            MotionEvent.ACTION_DOWN->{
-                drawPath!!.color=color
-                drawPath!!.brushThickness=brushSize
+            MotionEvent.ACTION_DOWN -> {
+                drawPath!!.color = color
+                drawPath!!.brushThickness = brushSize
 // Clear any lines and curves from the path, making it empty. This does NOT change the fill-type setting.
+               if (erase){
+                   drawPaint!!.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+                   drawPaint!!.color=Color.parseColor("#e2e2e2")
+               }
                 drawPath!!.reset()
-                drawPath!!.moveTo(touchX!!,touchY!!)
+                drawPath!!.moveTo(touchX!!, touchY!!)
             }
-            MotionEvent.ACTION_MOVE->{
-                drawPath!!.lineTo(touchX!!,touchY!!)
+            MotionEvent.ACTION_MOVE -> {
+
+                drawPath!!.lineTo(touchX!!, touchY!!)
+
             }
-            MotionEvent.ACTION_UP->{
+            MotionEvent.ACTION_UP -> {
                 paths.add(drawPath!!)
-                drawPath=CustomDrawPath(color,brushSize)
+                drawPath = CustomDrawPath(color, brushSize)
             }
             else->return false
         }
@@ -75,15 +112,22 @@ class DrawingView(context: Context,attr:AttributeSet): View(context,attr) {
         return true
     }
 
-    fun setSizeForBrush(newSize:Float){
-        brushSize=TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,newSize,resources.displayMetrics)
+    fun setSizeForBrush(newSize: Float){
+        brushSize=TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            newSize,
+            resources.displayMetrics
+        )
         drawPaint!!.strokeWidth=brushSize
     }
 
-    fun setBrushColor(c:Int){
+    fun setBrushColor(c: Int){
         color=c
         drawPaint!!.color=color
     }
 
-    internal inner class CustomDrawPath(var color:Int,var brushThickness:Float):Path()
+    internal inner class CustomDrawPath(
+        var color: Int,
+        var brushThickness: Float,
+    ):Path()
 }

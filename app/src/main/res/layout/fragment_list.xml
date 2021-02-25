@@ -35,7 +35,6 @@
         android:id="@+id/menuButton"
         app:fabSize="normal"
         app:pressedTranslationZ="12dp"
-        app:fab_showShadow="false"
         android:src="@drawable/ic_add"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -49,7 +48,7 @@
         android:id="@+id/addList"
         app:backgroundTint="@color/secondaryColor"
         android:visibility="invisible"
-        android:navigateToAddFragment="@{true}"
+       android:navigateToCheckListFragment="@{true}"
         android:src="@drawable/ic_baseline_format_list_bulleted_24"/>
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addNote"
@@ -60,7 +59,7 @@
             android:layout_gravity="bottom|end"
             app:backgroundTint="@color/secondaryColor"
             android:visibility="invisible"
-            android:navigateToCheckListFragment="@{true}"
+            android:navigateToAddFragment="@{true}"
             app:fabSize="mini"
             android:src="@drawable/ic_baseline_note_add_24"
             />

@@ -69,7 +69,6 @@ class AddFragment : Fragment(),SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCo
         mediaPlayer?.setOnCompletionListener(this)
         view.playButton.setOnClickListener { playAndPauseAudio() }
         SharedViewModel.audioRecorded.observe(viewLifecycleOwner, {
-            Log.i("changed", it)
             if(it!=""){
             audioFilePath = it
             view.mediaPlayer.visibility = View.VISIBLE

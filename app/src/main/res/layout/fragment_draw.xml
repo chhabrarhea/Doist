@@ -2,29 +2,50 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.draw.DrawFragment">
+     <androidx.appcompat.widget.Toolbar
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:background="@color/primaryDarkColor"
+         android:layout_gravity="top"
+         app:title=""
+         android:layout_alignParentTop="true"
+         android:fitsSystemWindows="true"
+         android:id="@+id/toolbar"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp"
+        android:layout_below="@id/toolbar">
+        <ImageView
+            android:id="@+id/grid_background"
+            android:layout_width="match_parent"
+            android:background="#e2e2e2"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"/>
 
    <com.example.todo.fragments.draw.DrawingView
        android:id="@+id/canvas"
-       android:layout_marginHorizontal="5dp"
-       android:layout_marginTop="5dp"
-       android:background="@drawable/media_player_background"
-       android:layout_height="wrap_content"
-       android:layout_marginBottom="56dp"
-       app:layout_anchorGravity="top"
-       android:layout_width="match_parent"
-
-      />
+       android:background="#80FFffff"
+       android:layout_height="match_parent"
+       android:layout_width="match_parent" />
+    </FrameLayout>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:elevation="10dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/cii">
 
   <androidx.cardview.widget.CardView
       android:layout_width="match_parent"
      android:id="@+id/bottomSheet"
       app:behavior_hideable="false"
       app:cardCornerRadius="15dp"
-      app:cardBackgroundColor="#E4E8E5"
+      app:cardBackgroundColor="@color/white"
       app:behavior_peekHeight="56dp"
       android:paddingVertical="5dp"
       android:layout_height="wrap_content"
@@ -55,7 +76,7 @@
     android:id="@+id/detail"/>
       </RelativeLayout>
   </androidx.cardview.widget.CardView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>
 </layout>
