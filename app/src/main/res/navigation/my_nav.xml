@@ -41,7 +41,7 @@
     </fragment>
     <fragment
         android:id="@+id/addFragment"
-        android:name="com.example.todo.fragments.add.AddFragment"
+        android:name="com.example.todo.fragments.note.AddFragment"
         android:label="Add"
         tools:layout="@layout/fragment_add" >
         <action
@@ -69,7 +69,7 @@
     </fragment>
     <fragment
         android:id="@+id/updateFragment"
-        android:name="com.example.todo.fragments.update.UpdateFragment"
+        android:name="com.example.todo.fragments.note.UpdateFragment"
         android:label="Update"
         tools:layout="@layout/fragment_update" >
         <action

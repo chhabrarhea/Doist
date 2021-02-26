@@ -1,12 +1,11 @@
 package com.example.todo.fragments.draw
 
+import android.app.AlertDialog
 import android.app.Dialog
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -19,8 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 class DrawFragment : Fragment(){
 private lateinit var binding:FragmentDrawBinding
 private lateinit var sheetBehavior:BottomSheetBehavior<CardView>
-private var prevStroke:RelativeLayout?=null
-    private var prevColor:CardView?=null
+
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -40,58 +38,39 @@ private var prevStroke:RelativeLayout?=null
             binding.detail.pen.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.secondaryColor))
             binding.detail.eraser.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.white))
         }
+        binding.detail.delete.setOnClickListener{
+            val alertDialog=AlertDialog.Builder(requireContext())
+            alertDialog.setTitle("Clear Canvas")
+            alertDialog.setMessage("Are you sure you want to delete your progress?")
+            alertDialog.setPositiveButton("Yes"){_,_->
+                run {
+                    binding.canvas.clearBrushes()
+                }
+            }
+            alertDialog.setNegativeButton("No"){_,_->}
+        }
         return binding.root
     }
 
     private fun initStrokeOptions() {
-            binding.detail.ib10Brush.setOnClickListener {
-                binding.canvas.setSizeForBrush(9.toFloat())
-            updatePrevStroke(binding.detail.ib10Brush)}
-            binding.detail.ib5Brush.setOnClickListener { binding.canvas.setSizeForBrush(5.toFloat())
-            updatePrevStroke( binding.detail.ib5Brush)}
-            binding.detail.ib15Brush.setOnClickListener { binding.canvas.setSizeForBrush(14.toFloat())
-            updatePrevStroke(binding.detail.ib15Brush)}
-            binding.detail.ib17Brush.setOnClickListener { binding.canvas.setSizeForBrush(16.5.toFloat())
-            updatePrevStroke(binding.detail.ib17Brush)}
-            binding.detail.ib20Brush.setOnClickListener { binding.canvas.setSizeForBrush(20.toFloat())
-            updatePrevStroke(binding.detail.ib20Brush)}
-            binding.detail.ib25Brush.setOnClickListener { binding.canvas.setSizeForBrush(25.toFloat())
-            updatePrevStroke(binding.detail.ib25Brush)}
-
+           BrushSizePicker(binding.detail.brush,requireContext(),object:BrushSizePicker.SizeSelected{
+               override fun sizeSelected(size: Float) {
+                   binding.canvas.setSizeForBrush(size)
+               }
+           })
     }
 
     private fun initColorOptions(){
-        prevColor=binding.detail.black
-        binding.detail.black.setOnClickListener{ updatePrevColor( binding.detail.black)}
-        binding.detail.red.setOnClickListener{updatePrevColor( binding.detail.red)}
-        binding.detail.pink.setOnClickListener{updatePrevColor( binding.detail.pink)}
-        binding.detail.purple.setOnClickListener{updatePrevColor( binding.detail.purple)}
-        binding.detail.green.setOnClickListener{updatePrevColor( binding.detail.green)}
-        binding.detail.blue.setOnClickListener{updatePrevColor(binding.detail.blue)}
-        binding.detail.brown.setOnClickListener{updatePrevColor(binding.detail.brown)}
-        binding.detail.cyan.setOnClickListener{updatePrevColor(binding.detail.cyan)}
+        ColorPicker(binding.detail.palette,object:ColorPicker.ColorPicked{
+            override fun colorPicked(color: Int) {
+                binding.canvas.setBrushColor(color)
+            }
+        })
     }
 
-    private fun updatePrevStroke(relativeLayout: RelativeLayout) {
-          if (prevStroke!=null){
-              val card=prevStroke!!.getChildAt(0) as CardView
-              card.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.darkGray))}
-        val card=relativeLayout.getChildAt(0) as CardView
-        card.setCardBackgroundColor(Color.BLACK)
-        prevStroke=relativeLayout
-    }
 
-    private fun updatePrevColor(card:CardView){
-        if (prevColor!=null){
-            val button=prevColor!!.getChildAt(0) as ImageButton
-            button.visibility=View.GONE
-        }
-        binding.canvas.setBrushColor(card.cardBackgroundColor.defaultColor)
 
-        val button=card.getChildAt(0) as ImageButton
-        button.visibility=View.VISIBLE
-        prevColor=card
-    }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.draw_fragment_menu,menu)
@@ -114,7 +93,7 @@ private var prevStroke:RelativeLayout?=null
 
     private fun openGridDialog() {
         val dialog=Dialog(requireContext())
-        dialog.setContentView(R.layout.grid_dialog);
+        dialog.setContentView(R.layout.grid_dialog)
         dialog.setTitle("Choose Grid:")
         dialog.findViewById<RelativeLayout>(R.id.grid).setOnClickListener { binding.gridBackground.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_grid_texture))
             binding.gridBackground.scaleType=ImageView.ScaleType.FIT_XY

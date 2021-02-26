@@ -1,20 +1,16 @@
-package com.example.todo.fragments.add
+package com.example.todo.fragments.note
 
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.graphics.drawable.Animatable
-import android.media.AudioAttributes
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Patterns
 import android.view.*
-import android.widget.*
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -26,25 +22,17 @@ import com.example.todo.R
 import com.example.todo.data.TodoViewModel
 import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentAddBinding
+import com.example.todo.fragments.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
-import java.io.File
-import java.io.FileInputStream
 import java.lang.reflect.Method
-import java.util.*
 
 
-class AddFragment : Fragment(),SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener{
+class AddFragment : Fragment(){
     private lateinit var view: FragmentAddBinding
     private val todoViewModel: TodoViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
-    private  var mediaPlayer:MediaPlayer?=null
-    private var isStarted=false
-    private var pause=false
     private var noteUrl=""
-    private lateinit var anim: Animatable
-    private  var runnable: Runnable?=null
-    private var handler: Handler = Handler(Looper.getMainLooper())
-    private var audioFilePath=""
+    private lateinit var mediaPlayerLifeCycle: MediaPlayerLifeCycle
 
 
     override fun onCreateView(
@@ -63,30 +51,15 @@ class AddFragment : Fragment(),SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCo
         view.priorityIndicator.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.high))
         view.prioritiesSpinner.onSpinnerItemSelectedListener = sharedViewModel.initializeSpinner(requireContext(),view.priorityIndicator)
 
-        if(audioFilePath!="" && SharedViewModel.audioRecorded.value=="")
+        mediaPlayerLifeCycle= MediaPlayerLifeCycle(view.mediaPlayer,requireContext(),"")
+        if(mediaPlayerLifeCycle.audioFilePath!="" && SharedViewModel.audioRecorded.value=="")
             sharedViewModel.setRecordAudio("")
-        mediaPlayer=MediaPlayer()
-        mediaPlayer?.setOnCompletionListener(this)
-        view.playButton.setOnClickListener { playAndPauseAudio() }
         SharedViewModel.audioRecorded.observe(viewLifecycleOwner, {
-            if(it!=""){
-            audioFilePath = it
-            view.mediaPlayer.visibility = View.VISIBLE
-            isStarted = false
-            if (mediaPlayer==null){
-                mediaPlayer = MediaPlayer().apply {
-                    setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .build()
-                    )
-            }} }})
+            if(it!="") mediaPlayerLifeCycle.initializeMediaPlayer(it)})
 
         view.deleteImage.setOnClickListener { removeImage() }
         view.deleteUrl.setOnClickListener { removeUrl() }
         view.deleteAudio.setOnClickListener { removeMediaPlayer() }
-        view.seekBar.setOnSeekBarChangeListener(this)
         return view.root
 
     }
@@ -206,7 +179,7 @@ class AddFragment : Fragment(),SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCo
                 view.deleteImage.visibility=View.VISIBLE
             }
             else if(requestCode==sharedViewModel.fromGallery && data!=null){
-                val uri = data.getData()!!
+                val uri = data.data!!
                 Glide.with(requireContext()).load(uri.toString()).into(view.image)
                 view.image.visibility=View.VISIBLE
                 view.deleteImage.visibility=View.VISIBLE
@@ -238,7 +211,7 @@ class AddFragment : Fragment(),SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCo
                 sharedViewModel.parsePriorityById(priority),
                 desc,
                 view.timeText.text.toString(),
-                sharedViewModel.mCurrentPhotoPath, audioFilePath,
+                sharedViewModel.mCurrentPhotoPath,mediaPlayerLifeCycle.audioFilePath,
                 noteUrl,null
             )
             todoViewModel.insertData(newData,requireContext())
@@ -317,111 +290,18 @@ class AddFragment : Fragment(),SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCo
         view.urlText.visibility=View.GONE
     }
     private fun removeMediaPlayer(){
-        view.mediaPlayer.visibility=View.GONE
-        sharedViewModel.setRecordAudio("")
-        mediaPlayer=null
-    }
+        mediaPlayerLifeCycle.removeMediaPlayer()
+        sharedViewModel.setRecordAudio("") }
 
     override fun onStop() {
         super.onStop()
-        if(mediaPlayer!=null) {
-            if(mediaPlayer!!.isPlaying()){
-                mediaPlayer!!.pause()
-               view.playButton.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.avd_pause_to_play))
-                anim=view.playButton.drawable as Animatable
-                anim.start()
-                pause=true
-            } }
+        mediaPlayerLifeCycle.stopMediaPlayer()
          sharedViewModel.setRecordAudio("")
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if(mediaPlayer!=null){
-            if(runnable!=null)
-            handler.removeCallbacks(runnable!!)
-            mediaPlayer!!.reset()
-            mediaPlayer!!.release()
-            mediaPlayer=null}
+        mediaPlayerLifeCycle.destroyMediaPlayer()
     }
-
-    private fun playAndPauseAudio() {
-        if (!isStarted) {
-            if (mediaPlayer==null)
-                return
-            val file = File(audioFilePath)
-            file.setReadable(true, false)
-            val inputStream = FileInputStream(file)
-            mediaPlayer!!.setDataSource(inputStream.getFD())
-            inputStream.close()
-            mediaPlayer!!.prepare()
-            mediaPlayer!!.setOnPreparedListener { mp: MediaPlayer ->
-                initializeSeekBar()
-                anim=view.playButton.drawable as Animatable
-                anim.start()
-                isStarted = true
-                mediaPlayer?.start()
-            }
-        }
-        //Pause playing audio
-        else if (mediaPlayer!!.isPlaying) {
-            mediaPlayer?.pause()
-            pause = true
-            view.playButton.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.avd_pause_to_play))
-            anim=view.playButton.drawable as Animatable
-            anim.start()
-
-        }
-        //Play paused audio
-        else  {
-            view.playButton.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.avd_play_to_pause))
-            anim=view.playButton.drawable as Animatable
-            anim.start()
-            initializeSeekBar()
-            mediaPlayer?.start()
-        }
-    }
-
-
-    private fun initializeSeekBar() {
-        if (mediaPlayer==null)
-            return
-        view.seekBar.max = mediaPlayer!!.duration/1000
-        view.tvDue.text = "${view.seekBar.max} secs"
-        runnable = Runnable {
-            view.seekBar.progress = mediaPlayer!!.currentPosition/1000
-            view.tvPass.text = "${mediaPlayer!!.currentPosition/1000} secs"
-            handler.postDelayed(runnable!!, 1000)
-        }
-        handler.postDelayed(runnable!!, 1000)
-    }
-
-    //automatically starts from beginning if start() is called
-    override fun onCompletion(p0: MediaPlayer) {
-        view.playButton.isEnabled = true
-        pause=true
-        view.playButton.setImageDrawable(
-            ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_play
-            )
-        )
-    }
-
-
-    override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-        if (p2) {
-            mediaPlayer?.seekTo(p1 * 1000)
-        }
-    }
-
-    override fun onStartTrackingTouch(p0: SeekBar?) {
-
-    }
-
-    override fun onStopTrackingTouch(p0: SeekBar?) {
-
-    }
-
 
 }

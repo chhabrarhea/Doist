@@ -1,14 +1,10 @@
 package com.example.todo.fragments.list
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todo.data.models.CheckListTask
@@ -30,18 +26,15 @@ class ListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(),Filterable{
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        var viewHolder:RecyclerView.ViewHolder?=null
-        when (viewType) {
-
-            1 -> viewHolder= CheckListViewHolder(
+        return when (viewType) {
+            1 -> CheckListViewHolder(
                 RowLayoutChecklistBinding.inflate(
                     inflater,
                     parent,
                     false))
             else -> {
-                viewHolder= NoteViewHolder(RowLayoutBinding.inflate(inflater, parent, false))
+                NoteViewHolder(RowLayoutBinding.inflate(inflater, parent, false))
             }}
-        return viewHolder
     }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -86,12 +79,11 @@ class ListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(),Filterable{
         }
 
         override fun getItemViewType(position: Int): Int {
-            if (filteredList.get(position).description.equals(""))
-                return list
-            else if (filteredList.get(position).checklist == null)
-                return note
-            else
-                return -1
+            return when {
+                filteredList[position].description == "" -> list
+                filteredList[position].checklist == null -> note
+                else -> -1
+            }
         }
 
         override fun getFilter(): Filter {
@@ -103,9 +95,10 @@ class ListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(),Filterable{
                     if (constraint == null || constraint.isEmpty()) {
                         list.addAll(dataList)
                     } else {
-                        val filterPattern: String = constraint.toString().toLowerCase().trim()
+                        val filterPattern: String = constraint.toString().toLowerCase(Locale.ROOT)
+                            .trim()
                         for (item in dataList) {
-                            if (item.title.toLowerCase().contains(filterPattern)) {
+                            if (item.title.toLowerCase(Locale.ROOT).contains(filterPattern)) {
                                 list.add(item)
                             }
                         }

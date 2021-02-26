@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.example.todo.appwidget.MyWidgetRemoteViewsService
-import com.example.todo.fragments.update.UpdateFragment
 
 
 /**

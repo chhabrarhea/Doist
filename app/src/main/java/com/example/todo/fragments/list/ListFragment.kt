@@ -1,5 +1,6 @@
 package com.example.todo.fragments.list
 
+import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -33,6 +34,7 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
     private val todoViewModel:TodoViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
     lateinit var view: FragmentListBinding
+    private lateinit var anim:Animatable
     var  isFabMenuOpen=false
     var staggered=true
     private lateinit var gridView:MenuItem
@@ -81,10 +83,13 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
         searchView?.isSubmitButtonEnabled = true
         searchView?.setOnQueryTextListener(this)
         gridView=menu.findItem(R.id.menu_orientation)
-        if (staggered)
-            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.ic_list)
+        if (staggered){
+            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.avd_list_to_staggered)
+
+            }
         else
-            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.ic_staggered)
+            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.avd_stagerred_to_list)
+        anim=gridView.icon as Animatable
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -99,16 +104,19 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
     }
 
     private fun changeOrientation() {
+
         if(staggered){
-            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.ic_staggered)
+            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.avd_list_to_staggered)
             view.recyclerView.layoutManager=LinearLayoutManager(requireContext())
             view.recyclerView.adapter=adapter
         }else{
-            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.ic_list)
+            gridView.icon= ContextCompat.getDrawable(requireContext(), R.drawable.avd_stagerred_to_list)
             view.recyclerView.layoutManager=StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL)
             view.recyclerView.adapter=adapter
         }
         staggered=!staggered
+        anim=gridView.icon as Animatable
+        anim.start()
         sharedViewModel.setListOrientation(requireContext(),staggered)
     }
     private fun setRecyclerView(){

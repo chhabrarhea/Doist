@@ -1,5 +1,6 @@
 package com.example.todo.fragments.draw
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -37,7 +38,7 @@ class DrawingView(context: Context, attr: AttributeSet): View(context, attr) {
         canvas= Canvas(canvasBitmap!!)
     }
 
-    private fun clearBrushes() {
+     fun clearBrushes() {
         paths.clear()
         undoPaths.clear()
     }
@@ -72,7 +73,7 @@ class DrawingView(context: Context, attr: AttributeSet): View(context, attr) {
         }
     }
 
-    fun remove(i: Int){
+    private fun remove(i: Int){
         paths.removeAt(i)
         invalidate()
 
@@ -80,6 +81,7 @@ class DrawingView(context: Context, attr: AttributeSet): View(context, attr) {
     fun onEraser() {
         erase = !erase
     }
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         val touchX=event?.x
         val touchY=event?.y

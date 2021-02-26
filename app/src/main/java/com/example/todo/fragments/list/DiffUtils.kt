@@ -19,13 +19,11 @@ class DiffUtils (private val oldList: List<ToDoData>,
     }
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        Log.i("areItemsTheSame","${oldItemPosition} new: $newItemPosition")
         return oldList[oldItemPosition] === newList[newItemPosition]
 
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        Log.i("areContentsTheSame","${oldItemPosition} new: $newItemPosition")
         return oldList[oldItemPosition].id == newList[newItemPosition].id
                 && oldList[oldItemPosition].title == newList[newItemPosition].title
                 && oldList[oldItemPosition].description == newList[newItemPosition].description

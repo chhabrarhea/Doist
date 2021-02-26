@@ -11,7 +11,7 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 <item
     android:id="@+id/menu_orientation"
-    android:icon="@drawable/ic_staggered"
+    android:icon="@drawable/avd_stagerred_to_list"
     android:title="@string/orientation"
     app:showAsAction="always"/>
     <group android:checkableBehavior="single">

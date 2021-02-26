@@ -1,6 +1,7 @@
 package com.example.todo.fragments.record
 
 import android.content.pm.PackageManager
+import android.graphics.drawable.Animatable
 import android.media.MediaPlayer
 import android.os.*
 import android.util.Log
@@ -17,6 +18,7 @@ import com.example.todo.R
 import com.example.todo.databinding.FragmentRecordAudioBinding
 import com.example.todo.fragments.SharedViewModel
 import com.github.squti.androidwaverecorder.WaveRecorder
+import kotlinx.coroutines.NonCancellable.start
 import org.angmarch.views.NiceSpinner
 import org.angmarch.views.OnSpinnerItemSelectedListener
 import java.io.File
@@ -37,6 +39,7 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
     private var runnable: Runnable?=null
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var pause: Boolean = false
+    private lateinit var anim:Animatable
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,7 +80,7 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
             binding.playButton.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
-                    R.drawable.ic_play
+                    R.drawable.avd_pause_to_play
                 )
             )
             binding.stopBtn.isEnabled = false
@@ -101,12 +104,16 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
             mediaPlayer!!.stop()
             mediaPlayer!!.reset()
             isStarted=false
+            if (mediaPlayer!!.isPlaying){
+                pause=true
             binding.playButton.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
-                    R.drawable.ic_play
+                    R.drawable.avd_pause_to_play
                 )
-            )
+            )}
+            anim=binding.playButton.drawable as Animatable
+            anim.start()
             binding.playButton.isEnabled=false
             binding.stopBtn.isEnabled=false
             binding.seekBar.progress=0
@@ -165,7 +172,6 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
     private fun playAndPauseAudio() {
         //initialize mediaPlayer
 //       mediaPlayer goes to idle state after calling reset
-        Log.i("play", "$")
         if (mediaPlayer==null)
             return
         if (!isStarted) {
@@ -178,12 +184,8 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
             mediaPlayer!!.setOnPreparedListener { mp: MediaPlayer? ->
                 initializeSeekBar()
                 mediaPlayer!!.start()
-                binding.playButton.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.ic_pause
-                    )
-                )
+                anim=binding.playButton.drawable as Animatable
+                anim.start()
                 isStarted = true
                 binding.stopBtn.isEnabled=true
             }
@@ -192,19 +194,16 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
         else if (mediaPlayer!!.isPlaying) {
             mediaPlayer!!.pause()
             pause = true
-            binding.playButton.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_play
-                )
-            )
+            binding.playButton.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.avd_pause_to_play))
+            anim=binding.playButton.drawable as Animatable
+            anim.start()
         }
         //Play paused audio
         else  {
             binding.playButton.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
-                    R.drawable.ic_pause
+                    R.drawable.avd_pause_to_play
                 )
             )
             mediaPlayer!!.start()
@@ -235,7 +234,7 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
         binding.playButton.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
-                R.drawable.ic_play
+                R.drawable.avd_pause_to_play
             )
         )
     }
@@ -260,7 +259,7 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
         if(mediaPlayer!=null) {
             if(mediaPlayer!!.isPlaying() || pause){
                 mediaPlayer!!.pause()
-                binding.playButton.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_play))
+                binding.playButton.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.avd_pause_to_play))
                 pause=true
             }
         }}

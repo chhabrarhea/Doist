@@ -98,7 +98,7 @@
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_play"
+                android:src="@drawable/avd_play_to_pause"
                 android:id="@+id/playButton"
                 android:contentDescription="@string/play_audio"
                 app:fabSize="mini"/>
