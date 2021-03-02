@@ -99,7 +99,7 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
                     "",
                     "",
                     "",
-                    adapter.listTask
+                    adapter.listTask,""
                 ),requireContext()
             )
             Toast.makeText(requireContext(),"Successfully updated ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()

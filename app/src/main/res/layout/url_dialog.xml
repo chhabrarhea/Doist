@@ -1,15 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="15dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/title"
+        android:text="Set Web Link"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_marginTop="15dp"
         android:hint="URL"
         android:textSize="18sp"
         android:id="@+id/url_edittext"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:id="@+id/ok"
+        android:layout_height="40dp"
+        android:layout_marginEnd="20dp"
+        android:layout_toLeftOf="@id/cancel"
+        android:layout_below="@id/url_edittext"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button"
+        app:backgroundTint="@color/secondaryColor"
+        android:text="OK"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:id="@+id/cancel"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/url_edittext"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/media_player_background"
+        app:backgroundTint="@color/darkGray"
+        android:text="Cancel"/>
 
 
 
 </RelativeLayout>
+</layout>

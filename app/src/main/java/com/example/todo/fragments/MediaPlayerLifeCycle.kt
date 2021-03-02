@@ -21,6 +21,7 @@ class MediaPlayerLifeCycle(
     val context: Context,
     var audioFilePath: String
 ) : SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener {
+
     private val seekBar: SeekBar = view.findViewById(R.id.seek_bar)
     private val tvDue: TextView = view.findViewById(R.id.tv_due)
     private val tvPass: TextView = view.findViewById(R.id.tv_pass)
@@ -28,15 +29,15 @@ class MediaPlayerLifeCycle(
     private var handler: Handler = Handler(Looper.getMainLooper())
     private val playButton: ImageButton = view.findViewById(R.id.playButton)
     private var mediaPlayer: MediaPlayer?
-    var pause = false
-    var isStarted = false
+    private var pause = false
+    private var isStarted = false
     private lateinit var anim: Animatable
 
 
     init {
         mediaPlayer = MediaPlayer()
         mediaPlayer?.setOnCompletionListener(this)
-        playButton.setOnClickListener { playAndPauseAudio() }
+        playButton.setOnClickListener {playAndPauseAudio()}
     }
 
 
@@ -60,10 +61,10 @@ class MediaPlayerLifeCycle(
             val file = File(audioFilePath)
             file.setReadable(true, false)
             val inputStream = FileInputStream(file)
-            mediaPlayer!!.setDataSource(inputStream.getFD())
+            mediaPlayer!!.setDataSource(inputStream.fd)
             inputStream.close()
             mediaPlayer!!.prepare()
-            mediaPlayer!!.setOnPreparedListener { mp: MediaPlayer ->
+            mediaPlayer!!.setOnPreparedListener {
                 initializeSeekBar()
                 anim = playButton.drawable as Animatable
                 anim.start()
@@ -147,7 +148,7 @@ class MediaPlayerLifeCycle(
 
     fun stopMediaPlayer() {
         if (mediaPlayer != null) {
-            if (mediaPlayer!!.isPlaying()) {
+            if (mediaPlayer!!.isPlaying) {
                 mediaPlayer!!.pause()
                 playButton.setImageDrawable(
                     ContextCompat.getDrawable(

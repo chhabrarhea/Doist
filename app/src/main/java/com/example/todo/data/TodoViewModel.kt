@@ -49,7 +49,7 @@ class TodoViewModel(application: Application):AndroidViewModel(application) {
         }
     }
     fun saveData(title: String,priority:Priority,date:String,list:List<CheckListTask>,context: Context){
-        val task= ToDoData(0,title,priority,"",date,"","","",list)
+        val task= ToDoData(0,title,priority,"",date,"","","",list,"")
         viewModelScope.launch {
             repository.insertTodo(task)
             NewAppWidget().sendRefreshBroadcast(context)

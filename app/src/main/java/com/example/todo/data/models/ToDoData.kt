@@ -17,5 +17,6 @@ data class ToDoData(
     var image:String,
     var voicenote:String,
     var url:String,
-    var checklist: List<CheckListTask>?
+    var checklist: List<CheckListTask>?,
+    var canvasPath:String
 ): Parcelable

@@ -7,9 +7,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.util.Patterns
 import android.view.*
-import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +23,7 @@ import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentAddBinding
 import com.example.todo.fragments.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.reflect.Method
 
 
@@ -31,8 +31,8 @@ class AddFragment : Fragment(){
     private lateinit var view: FragmentAddBinding
     private val todoViewModel: TodoViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
-    private var noteUrl=""
     private lateinit var mediaPlayerLifeCycle: MediaPlayerLifeCycle
+    private var canvasPath:String=""
 
 
     override fun onCreateView(
@@ -56,15 +56,26 @@ class AddFragment : Fragment(){
             sharedViewModel.setRecordAudio("")
         SharedViewModel.audioRecorded.observe(viewLifecycleOwner, {
             if(it!="") mediaPlayerLifeCycle.initializeMediaPlayer(it)})
+        SharedViewModel.canvasImage.observe(viewLifecycleOwner,{
+            if(it!=""){
+                canvasPath=it
+                setImage(it,view.canvasImage,view.deleteCanvas)
+            }
+        })
 
         view.deleteImage.setOnClickListener { removeImage() }
         view.deleteUrl.setOnClickListener { removeUrl() }
         view.deleteAudio.setOnClickListener { removeMediaPlayer() }
+        view.deleteCanvas.setOnClickListener { removeCanvasImage() }
         return view.root
 
     }
 
-
+    private fun setImage(it: String?,image:ImageView,button:FloatingActionButton) {
+        Glide.with(requireContext()).load(it).into(image)
+        image.visibility=View.VISIBLE
+        button.visibility=View.VISIBLE
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.add_fragment_menu, menu)
@@ -111,28 +122,7 @@ class AddFragment : Fragment(){
     }
 
     private fun addURL() {
-        val dialogView=layoutInflater.inflate(R.layout.url_dialog, null, false)
-        val edit=dialogView.findViewById(R.id.url_edittext) as EditText
-        val builder= AlertDialog.Builder(requireContext())
-        builder.setView(dialogView).setPositiveButton("Done"){ _, _->run{}}.setNegativeButton("Cancel"){ dialog, _->run{
-            dialog.dismiss()
-        }}
-        val alert= builder.create()
-        alert.show()
-        alert.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener{
-            noteUrl=edit.text.toString()
-            if(Patterns.WEB_URL.matcher(noteUrl).matches()){
-                noteUrl=edit.text.toString()
-                view.urlText.visibility=View.VISIBLE
-                view.urlText.text=edit.text.toString()
-                view.deleteUrl.visibility=View.VISIBLE
-                alert.dismiss()
-            }else{
-                noteUrl=""
-                edit.error="Enter valid URL!"
-            }
-        }
-        Log.i("sjd", "$noteUrl,")
+        sharedViewModel.urlDialog(requireContext(),layoutInflater,view.url).show()
     }
 
     private fun addImage() {
@@ -162,7 +152,6 @@ class AddFragment : Fragment(){
             startActivityForResult(intent, sharedViewModel.fromCamera)
     }
 
-
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, sharedViewModel.fromGallery)
@@ -173,19 +162,13 @@ class AddFragment : Fragment(){
 
         if(resultCode==RESULT_OK){
             if (requestCode==sharedViewModel.fromCamera){
-                val uri = Uri.parse(sharedViewModel.mCurrentPhotoPath)
-                Glide.with(requireContext()).load(uri.toString()).override(500, 500).into(view.image)
-                view.image.visibility=View.VISIBLE
-                view.deleteImage.visibility=View.VISIBLE
+               setImage(sharedViewModel.mCurrentPhotoPath,view.image,view.deleteImage)
             }
             else if(requestCode==sharedViewModel.fromGallery && data!=null){
-                val uri = data.data!!
-                Glide.with(requireContext()).load(uri.toString()).into(view.image)
-                view.image.visibility=View.VISIBLE
-                view.deleteImage.visibility=View.VISIBLE
-                val path=sharedViewModel.getRealPathFromURI(uri, requireActivity())
+                val path=sharedViewModel.getRealPathFromURI(data.data!!, requireActivity())
                 if(path!=null){
                     sharedViewModel.mCurrentPhotoPath=path
+                    setImage(sharedViewModel.mCurrentPhotoPath,view.image,view.deleteImage)
                 }
             }
             else if(requestCode==77 && data!=null){
@@ -212,10 +195,11 @@ class AddFragment : Fragment(){
                 desc,
                 view.timeText.text.toString(),
                 sharedViewModel.mCurrentPhotoPath,mediaPlayerLifeCycle.audioFilePath,
-                noteUrl,null
+                view.urlText.text.toString(),null,canvasPath
             )
             todoViewModel.insertData(newData,requireContext())
             sharedViewModel.setRecordAudio("")
+            sharedViewModel.setCanvasImage("")
             Toast.makeText(requireContext(), "Added Successfully!", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_addFragment_to_listFragment)
         } else {
@@ -227,8 +211,7 @@ class AddFragment : Fragment(){
         if (menu.javaClass.simpleName == "MenuBuilder") {
             try {
 
-                val m: Method = menu.javaClass.getDeclaredMethod(
-                    "setOptionalIconsVisible", java.lang.Boolean.TYPE
+                val m: Method = menu.javaClass.getDeclaredMethod("setOptionalIconsVisible", java.lang.Boolean.TYPE
                 )
                 m.isAccessible = true
                 m.invoke(menu, true)
@@ -247,8 +230,7 @@ class AddFragment : Fragment(){
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
-    ) {
+        grantResults: IntArray) {
         when(requestCode){
             sharedViewModel.requestCodeForImagePermissions -> {
                 if (sharedViewModel.allPermissionsGrantedForImage(requireContext())) {
@@ -284,14 +266,21 @@ class AddFragment : Fragment(){
         view.image.visibility=View.GONE
         sharedViewModel.mCurrentPhotoPath=""
     }
+
     private fun removeUrl(){
-        noteUrl=""
-        view.deleteUrl.visibility=View.GONE
-        view.urlText.visibility=View.GONE
+       view.urlText.text=""
+       view.url.visibility=View.VISIBLE
     }
+
     private fun removeMediaPlayer(){
         mediaPlayerLifeCycle.removeMediaPlayer()
         sharedViewModel.setRecordAudio("") }
+
+    private fun removeCanvasImage(){
+        sharedViewModel.setCanvasImage("")
+        view.canvasImage.visibility=View.GONE
+        view.deleteCanvas.visibility=View.GONE
+    }
 
     override fun onStop() {
         super.onStop()
@@ -303,5 +292,4 @@ class AddFragment : Fragment(){
         super.onDestroyView()
         mediaPlayerLifeCycle.destroyMediaPlayer()
     }
-
 }

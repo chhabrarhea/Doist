@@ -1,5 +1,6 @@
 package com.example.todo.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -12,9 +13,14 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
+import android.util.Patterns
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
+import android.widget.EditText
+import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -24,6 +30,7 @@ import com.example.todo.BuildConfig
 import com.example.todo.R
 import com.example.todo.data.models.Priority
 import com.example.todo.data.models.ToDoData
+import com.example.todo.databinding.UrlDialogBinding
 import org.angmarch.views.OnSpinnerItemSelectedListener
 import java.io.File
 import java.io.IOException
@@ -36,7 +43,10 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     val fromCamera = 200
 
     companion object{
-    var audioRecorded=MutableLiveData("")}
+    var audioRecorded=MutableLiveData("")
+    var canvasImage=MutableLiveData("")}
+
+
 
     //constants for permissions and results
     val requiredPermissionForAudioRecord = arrayOf(
@@ -58,6 +68,28 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     val requestCodeForImagePermissions = 10
 
 
+
+
+    fun urlDialog(context: Context,layoutInflater:LayoutInflater,view:RelativeLayout):AlertDialog{
+        val binding=UrlDialogBinding.inflate(layoutInflater,null,false)
+        val builder= AlertDialog.Builder(context)
+        builder.setView(binding.root)
+        val alert= builder.create()
+        binding.cancel.setOnClickListener { alert.dismiss() }
+        binding.ok.setOnClickListener {
+            if(Patterns.WEB_URL.matcher(binding.urlEdittext.text).matches()){
+                view.visibility=View.VISIBLE
+                view.findViewById<TextView>(R.id.url_text).text=binding.urlEdittext.text.toString()
+                alert.dismiss()
+            }else{
+               binding.urlEdittext.error="Enter valid URL!"
+            } }
+        return alert}
+
+    @Synchronized fun setCanvasImage(s:String){
+        canvasImage.value=s
+    }
+
     fun validateData(title: String, desc: String): Boolean {
         return if (TextUtils.isEmpty(title) || TextUtils.isEmpty(desc)) {
             false
@@ -76,6 +108,9 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         val pref: SharedPreferences =
             context.getSharedPreferences("ToDoOrientation", Context.MODE_PRIVATE)
         return pref.getBoolean("StaggeredOrientation", true)
+    }
+   @Synchronized fun setCanvasFromBackground(res:String){
+                 canvasImage.postValue(res)
     }
 
 
@@ -103,7 +138,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
     }
 
-    fun setRecordAudio(path:String){
+    @Synchronized fun setRecordAudio(path:String){
             audioRecorded.value=path
         Log.i("onO","$path ${audioRecorded.value}")
     }
@@ -227,9 +262,10 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         return image
     }
 
+    @SuppressLint("Recycle")
     fun getRealPathFromURI(contentUri: Uri, context: Activity): String? {
         val proj = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor: Cursor? = context.getContentResolver().query(
+        val cursor: Cursor? = context.contentResolver.query(
             contentUri,
             proj,  // Which columns to return
             null,  // WHERE clause; which rows to return (all rows)

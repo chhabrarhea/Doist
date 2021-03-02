@@ -73,6 +73,7 @@
                     android:layout_centerInParent="true"
                     android:layout_marginTop="8dp"
                     android:visibility="gone"
+                    tools:visibility="visible"
                     android:LoadImageWithGlide="@{args.image}">
                 <ImageView
                     android:layout_width="wrap_content"
@@ -94,11 +95,39 @@
             </RelativeLayout>
                 <RelativeLayout
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/canvasRoot"
+                    android:layout_below="@id/imageRoot"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:LoadImageWithGlide="@{args.canvasPath}">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/canvas"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/noteimage" />
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="3dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="5dp"
+                        app:fabSize="mini"
+                        android:src="@drawable/ic_baseline_delete_24"
+                        android:id="@+id/deleteCanvas"
+                        android:elevation="10dp"
+                        android:contentDescription="@string/delete_image" />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/urlRoot"
                     android:setURL="@{args.url}"
                     android:layout_marginTop="8dp"
-                    android:layout_below="@id/imageRoot"
+                    android:layout_below="@id/canvasRoot"
                     android:visibility="gone">
                 <TextView
                     android:layout_width="match_parent"

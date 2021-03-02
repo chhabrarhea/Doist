@@ -9,6 +9,7 @@ import android.util.Log
 import android.util.Patterns
 import android.view.*
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -24,9 +25,11 @@ import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentUpdateBinding
 import com.example.todo.fragments.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.reflect.Method
 
 class UpdateFragment : Fragment() {
+
     private lateinit var view: FragmentUpdateBinding
     private lateinit var args: ToDoData
     private val sharedViewModel by viewModels<SharedViewModel>()
@@ -35,6 +38,7 @@ class UpdateFragment : Fragment() {
     private var noteUrl = ""
     private lateinit var uri: Uri
     private lateinit var mediaPlayerLifeCycle: MediaPlayerLifeCycle
+    private var canvasPath=""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,13 +52,20 @@ class UpdateFragment : Fragment() {
         view.args = args
 
 
-        mediaPlayerLifeCycle =
-            MediaPlayerLifeCycle(view.mediaPlayer, requireContext(), args.voicenote)
+        mediaPlayerLifeCycle = MediaPlayerLifeCycle(view.mediaPlayer, requireContext(), args.voicenote)
         if (SharedViewModel.audioRecorded.value == "" && mediaPlayerLifeCycle.audioFilePath != "")
             sharedViewModel.setRecordAudio(mediaPlayerLifeCycle.audioFilePath)
         SharedViewModel.audioRecorded.observe(viewLifecycleOwner, {
             if (it != "") mediaPlayerLifeCycle.initializeMediaPlayer(it)
         })
+
+        if(SharedViewModel.canvasImage.value=="" && args.canvasPath!="")
+            sharedViewModel.setCanvasImage("")
+        SharedViewModel.canvasImage.observe(viewLifecycleOwner,{
+            if(it!=""){
+                canvasPath=it
+                setImage(it,view.canvas,view.deleteCanvas)
+            } })
 
         sharedViewModel.mCurrentPhotoPath = args.image
         (activity as AppCompatActivity?)!!.setSupportActionBar(view.toolbar)
@@ -63,6 +74,7 @@ class UpdateFragment : Fragment() {
 
         view.deleteImage.setOnClickListener { removeImage() }
         view.deleteUrl.setOnClickListener { removeUrl() }
+        view.deleteCanvas.setOnClickListener { removeCanvasImage() }
         view.currentPrioritiesSpinner.onSpinnerItemSelectedListener =
             sharedViewModel.initializeSpinner(requireContext(), view.priorityIndicator)
         view.deleteAudio.setOnClickListener { removeMediaPlayer() }
@@ -171,13 +183,20 @@ class UpdateFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_save -> updateData()
+            R.id.menu_add -> updateData()
             R.id.menu_delete -> deleteData()
             R.id.menu_add_image -> addImage()
             R.id.add_url -> addURL()
             R.id.menu_add_vn -> addVn()
+            R.id.canvas->findNavController().navigate(R.id.action_addFragment_to_drawFragment)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setImage(it: String?,image:ImageView,float: FloatingActionButton) {
+        Glide.with(requireContext()).load(it).into(image)
+        image.visibility=View.VISIBLE
+        float.visibility=View.VISIBLE
     }
 
     private fun addURL() {
@@ -237,7 +256,7 @@ class UpdateFragment : Fragment() {
                 desc,
                 args.date,
                 sharedViewModel.mCurrentPhotoPath,
-                mediaPlayerLifeCycle.audioFilePath, noteUrl, null
+                mediaPlayerLifeCycle.audioFilePath, noteUrl, null,canvasPath
             )
             todoViewModel.updateData(newData, requireContext())
             Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
@@ -298,6 +317,12 @@ class UpdateFragment : Fragment() {
         view.urlText.visibility = View.GONE
     }
 
+    private fun removeCanvasImage(){
+        canvasPath=""
+        sharedViewModel.setCanvasImage("")
+        view.canvasRoot.visibility=View.GONE
+    }
+
     private fun removeMediaPlayer() {
         mediaPlayerLifeCycle.removeMediaPlayer()
         sharedViewModel.setRecordAudio("")
@@ -313,4 +338,6 @@ class UpdateFragment : Fragment() {
         super.onDestroyView()
         mediaPlayerLifeCycle.destroyMediaPlayer()
     }
+
+
 }

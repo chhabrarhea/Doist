@@ -2,7 +2,13 @@ package com.example.todo.fragments.draw
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.media.MediaScannerConnection
 import android.os.Bundle
+import android.content.Intent
 import android.view.*
 import android.widget.Button
 import androidx.fragment.app.Fragment
@@ -11,13 +17,26 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.todo.R
 import com.example.todo.databinding.FragmentDrawBinding
+import com.example.todo.fragments.SharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.util.jar.Manifest
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class DrawFragment : Fragment(){
 private lateinit var binding:FragmentDrawBinding
 private lateinit var sheetBehavior:BottomSheetBehavior<CardView>
+private val sharedViewModel:SharedViewModel by viewModels()
+    private var isSaved=false
 
 
 
@@ -82,13 +101,57 @@ private lateinit var sheetBehavior:BottomSheetBehavior<CardView>
             R.id.share->shareDrawing()
             R.id.undo->binding.canvas.undoPath()
             R.id.redo->binding.canvas.redoPath()
+            R.id.save->saveBitmap()
         }
         return super.onOptionsItemSelected(item)
     }
 
+    private fun saveBitmap() {
+        if(!checkForPermission())
+           requestPermissions(arrayOf(permission), permissionCode)
+        else{
+           CoroutineScope(IO).launch{
+               val a=async(IO) {
+                   saveImage(getBitmapFromView(binding.canvas))
+               }
+               sharedViewModel.setCanvasFromBackground(a.await())
+              isSaved=true
+       }}
+    }
+
+    private fun saveImageAndNavigate(){
+        if(!isSaved){
+        saveBitmap()}
+        findNavController().popBackStack()
+    }
+
 
     private fun shareDrawing() {
-        TODO("Not yet implemented")
+        if(!isSaved){
+            saveBitmap()}
+        MediaScannerConnection.scanFile(
+            requireContext(), arrayOf(SharedViewModel.canvasImage.value), null
+        ) { path, uri ->
+            // This is used for sharing the image after it has being stored in the storage.
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.putExtra(
+                Intent.EXTRA_STREAM,
+                uri
+            ) // A content: URI holding a stream of data associated with the Intent, used to supply the data being sent.
+            shareIntent.type =
+                "image/jpeg" // The MIME type of the data being handled by this intent.
+            startActivity(
+                Intent.createChooser(
+                    shareIntent,
+                    "Share"
+                )
+            )// Activity Action: Display an activity chooser,
+            // allowing the user to pick what they want to before proceeding.
+            // This can be used as an alternative to the standard activity picker
+            // that is displayed by the system when you try to start an activity with multiple possible matches,
+            // with these differences in behavior:
+        }
     }
 
     private fun openGridDialog() {
@@ -110,6 +173,93 @@ private lateinit var sheetBehavior:BottomSheetBehavior<CardView>
         dialog.findViewById<Button>(R.id.cancel).setOnClickListener{dialog.dismiss()}
         dialog.show()
     }
+
+    private fun getBitmapFromView(view: View): Bitmap {
+        val returnedBitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(returnedBitmap)
+        val bgDrawable = binding.gridBackground.drawable
+        if (bgDrawable != null) {
+            bgDrawable.draw(canvas)
+        } else {
+
+            canvas.drawColor(Color.parseColor("#e2e2e2"))
+        }
+        view.draw(canvas)
+        return returnedBitmap
+    }
+
+    companion object{
+        private const val permissionCode=2
+        private const val permission= android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+    }
+
+    private fun checkForPermission():Boolean{
+        if(ContextCompat.checkSelfPermission(requireContext(), permission)==PackageManager.PERMISSION_GRANTED)
+            return true
+        return false
+    }
+
+    private suspend fun saveImage(bitmap: Bitmap):String = withContext(IO){
+        var result: String
+        try {
+            val bytes = ByteArrayOutputStream() // Creates a new byte array output stream.
+            // The buffer capacity is initially 32 bytes, though its size increases if necessary.
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, bytes)
+            /**
+             * Write a compressed version of the bitmap to the specified output stream.
+             * If this returns true, the bitmap can be reconstructed by passing a
+             * corresponding input stream to BitmapFactory.decodeStream(). Note: not
+             * all Formats support all bitmap configs directly, so it is possible that
+             * the returned bitmap from BitmapFactory could be in a different bit depth,
+             * and/or may have lost per-pixel alpha (e.g. JPEG only supports opaque
+             * pixels).
+             *
+             * @param format   The format of the compressed image
+             * @param quality  Hint to the compressor, 0-100. 0 meaning compress for
+             *                 small size, 100 meaning compress for max quality. Some
+             *                 formats, like PNG which is lossless, will ignore the
+             *                 quality setting
+             * @param stream   The output stream to write the compressed data.
+             * @return true if successfully compressed to the specified stream.
+             */
+            /**
+             * Write a compressed version of the bitmap to the specified output stream.
+             * If this returns true, the bitmap can be reconstructed by passing a
+             * corresponding input stream to BitmapFactory.decodeStream(). Note: not
+             * all Formats support all bitmap configs directly, so it is possible that
+             * the returned bitmap from BitmapFactory could be in a different bit depth,
+             * and/or may have lost per-pixel alpha (e.g. JPEG only supports opaque
+             * pixels).
+             *
+             * @param format   The format of the compressed image
+             * @param quality  Hint to the compressor, 0-100. 0 meaning compress for
+             *                 small size, 100 meaning compress for max quality. Some
+             *                 formats, like PNG which is lossless, will ignore the
+             *                 quality setting
+             * @param stream   The output stream to write the compressed data.
+             * @return true if successfully compressed to the specified stream.
+             */
+
+            val f = File(
+                requireContext().externalCacheDir!!.absoluteFile.toString()
+                        + File.separator + "Doist_" + System.currentTimeMillis() / 1000 + ".jpg"
+            )
+
+            val fo = FileOutputStream(f) // Creates a file output stream to write to the file represented by the specified object.
+            fo.write(bytes.toByteArray()) // Writes bytes from the specified byte array to this file output stream.
+            fo.close() // Closes this file output stream and releases any system resources associated with this stream. This file output stream may no longer be used for writing bytes.
+            result = f.absolutePath // The file absolute path is return as a result.
+        } catch (e: Exception) {
+            result = ""
+            e.printStackTrace()
+        }
+
+        return@withContext result
+        }
+
+
+
 
 
 }

@@ -85,18 +85,50 @@
                     android:id="@+id/deleteImage"
                     android:elevation="10dp"
                     android:contentDescription="@string/delete_image" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/canvas_image"
+                    android:visibility="gone"
+                    android:padding="0dp"
+                    tools:visibility="visible"
+                    tools:layout_width="match_parent"
+                    tools:layout_height="100dp"
+                    tools:background="@color/primaryDarkColor"
+                    android:adjustViewBounds="true"
+                    android:layout_below="@id/image"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@string/noteimage" />
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fabSize="mini"
+                    tools:visibility="visible"
+                    android:layout_below="@id/image"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="5dp"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_baseline_delete_24"
+                    android:id="@+id/deleteCanvas"
+                    android:elevation="10dp"
+                    android:contentDescription="@string/delete_image" />
+                <RelativeLayout
+                    android:id="@+id/url"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:layout_below="@id/canvas_image">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingVertical="18sp"
                     android:id="@+id/url_text"
                     android:autoLink="web"
-                    android:layout_marginTop="8dp"
                     android:textStyle="italic"
-                    android:visibility="gone"
-                    tools:visibility="visible"
                     android:layout_toStartOf="@id/deleteUrl"
-                    android:layout_below="@id/image"
                     android:drawablePadding="10dp"
                     android:textSize="16sp"
                     app:drawableLeftCompat="@drawable/ic_url"
@@ -105,15 +137,13 @@
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/image"
                     app:fabSize="mini"
-                    tools:visibility="visible"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="12dp"
-                    android:visibility="gone"
+                    android:layout_centerVertical="true"
                     android:src="@drawable/ic_baseline_delete_24"
                     android:id="@+id/deleteUrl"
                     android:contentDescription="@string/delete_url" />
+                </RelativeLayout>
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -124,7 +154,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="5dp"
                     android:background="@drawable/media_player_background"
-                    android:layout_below="@id/url_text"
+                    android:layout_below="@id/url"
                     >
                     <TextView
                         android:id="@+id/tv_pass"
