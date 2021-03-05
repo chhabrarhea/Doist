@@ -28,11 +28,11 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
     private val sharedViewModel: SharedViewModel by viewModels()
     lateinit var view: FragmentListBinding
     private lateinit var anim:Animatable
-    var  isFabMenuOpen=false
-    var staggered=true
+    private var  isFabMenuOpen=false
+    private var staggered=true
     private lateinit var gridView:MenuItem
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         view=FragmentListBinding.inflate(inflater, container, false)
         setRecyclerView()
@@ -55,17 +55,16 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
 
     private fun toggleMenu() {
         FabAnimation.rotate(view.menuButton,!isFabMenuOpen)
-         if(!isFabMenuOpen){
+        isFabMenuOpen = if(!isFabMenuOpen){
             FabAnimation.fabOpen(view.addList)
             FabAnimation.fabOpen(view.addNote)
-            isFabMenuOpen=true
+            true
 
-         }
-        else {
-             FabAnimation.fabClose(view.addList)
-             FabAnimation.fabClose(view.addNote)
-             isFabMenuOpen=false
-         }
+        } else {
+            FabAnimation.fabClose(view.addList)
+            FabAnimation.fabClose(view.addNote)
+            false
+        }
     }
 
 
@@ -151,7 +150,7 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
                         Snackbar.LENGTH_LONG
                 )
                 snackBar.setAction("Undo") {
-                    todoViewModel.insertData(deletedItem,requireContext())
+                    todoViewModel.insertData(deletedItem,requireContext(),null)
 
                 }
                 snackBar.show()
@@ -177,7 +176,7 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
     override fun onStop() {
         super.onStop()
         for(todo in adapter.alteredList){
-            todoViewModel.updateData(todo,requireContext())
+            todoViewModel.updateData(todo,requireContext(),null)
         }
     }
 
