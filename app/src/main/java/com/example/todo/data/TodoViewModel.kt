@@ -26,41 +26,24 @@ class TodoViewModel(application: Application):AndroidViewModel(application) {
 
     val getAllData:LiveData<List<ToDoData>> = repository.getAllData
 
-    fun insertData(toDoData: ToDoData, context: Context){
-        viewModelScope.launch {
-            repository.insertTodo(toDoData)
-            NewAppWidget().sendRefreshBroadcast(context)
-        }
-    }
 
-    fun insertDataAndSetReminder(toDo: ToDoData, context: Context, date: Calendar){
+    fun insertData(toDo: ToDoData, context: Context, date: Calendar?){
         viewModelScope.launch {
            val id= repository.insertTodo(toDo)
             NewAppWidget().sendRefreshBroadcast(context)
-            val calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"))
-            calendar.time = date.time
-            calendar.set(Calendar.SECOND, 0)
-            val intent = Intent(context, NotifierAlarm::class.java)
-            val todoBundle = Bundle()
+            if(id>0 && date!=null){
             toDo.id=id.toInt()
-            todoBundle.putParcelable("currentItem", toDo)
-            intent.putExtra("currentItem", todoBundle)
-            val intent1 = PendingIntent.getBroadcast(
-                context,
-                id.toInt(),
-                intent,
-                PendingIntent.FLAG_CANCEL_CURRENT
-            )
-            val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager?
-            alarmManager!!.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, intent1)
+            setReminder(toDo,context,date)}
 
         }
     }
 
-    fun updateData(toDo: ToDoData, context: Context){
+    fun updateData(toDo: ToDoData, context: Context,date: Calendar?){
         viewModelScope.launch {
             repository.updateData(toDo)
             NewAppWidget().sendRefreshBroadcast(context)
+            if(date!=null){
+                setReminder(toDo,context,date)}
         }
 
     }
@@ -98,5 +81,24 @@ class TodoViewModel(application: Application):AndroidViewModel(application) {
     fun deleteReminder(id:Int){
         viewModelScope.launch {
         repository.deleteReminder(id)}
+    }
+
+    fun setReminder(toDo: ToDoData, context: Context, date: Calendar){
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"))
+            calendar.time = date.time
+            calendar.set(Calendar.SECOND, 0)
+            val intent = Intent(context, NotifierAlarm::class.java)
+            val todoBundle = Bundle()
+            todoBundle.putParcelable("currentItem", toDo)
+            intent.putExtra("currentItem", todoBundle)
+            val intent1 = PendingIntent.getBroadcast(
+                context,
+                toDo.id,
+                intent,
+                PendingIntent.FLAG_CANCEL_CURRENT
+            )
+            val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager?
+            alarmManager!!.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, intent1)
+
     }
 }

@@ -99,9 +99,12 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
         if (binding.titleEt.text.toString().isEmpty() || adapter.listTask.size == 0)
             Toast.makeText(requireContext(), "Some required fields are empty!", Toast.LENGTH_SHORT)
                 .show()
+        else if(viewModel.date!=null && viewModel.date!!.timeInMillis<System.currentTimeMillis()){
+            Toast.makeText(requireContext(), "Set a later time for reminder!", Toast.LENGTH_SHORT)
+                .show()
+        }
         else {
-            todoViewModel.updateData(
-                ToDoData(
+            val todo= ToDoData(
                     args.id,
                     binding.titleEt.text.toString(),
                     viewModel.parsePriority(binding.prioritiesSpinner.selectedItem.toString()),
@@ -110,8 +113,8 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
                     "",
                     "",
                     "",
-                    adapter.listTask,"",viewModel.dateString),requireContext()
-            )
+                    adapter.listTask,"",viewModel.dateString)
+                todoViewModel.updateData(todo,requireContext(),viewModel.date)
             Toast.makeText(requireContext(),"Successfully updated ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_updateCheckListFragment_to_listFragment)
         }

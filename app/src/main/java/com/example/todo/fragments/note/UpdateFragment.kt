@@ -268,7 +268,7 @@ class UpdateFragment : Fragment() {
                 sharedViewModel.mCurrentPhotoPath,
                 mediaPlayerLifeCycle.audioFilePath, noteUrl, null,canvasPath,sharedViewModel.dateString
             )
-            todoViewModel.updateData(newData, requireContext())
+            todoViewModel.updateData(newData, requireContext(),sharedViewModel.date)
             sharedViewModel.deinitializeSharedVariables()
             Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_updateFragment_to_listFragment)

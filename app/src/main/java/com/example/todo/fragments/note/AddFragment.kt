@@ -189,10 +189,7 @@ class AddFragment : Fragment(){
                 sharedViewModel.mCurrentPhotoPath, mediaPlayerLifeCycle.audioFilePath,
                 view.urlText.text.toString(), null, canvasPath,sharedViewModel.dateString
             )
-            if (sharedViewModel.date==null)
-                todoViewModel.insertData(newData,requireContext())
-            else
-                todoViewModel.insertDataAndSetReminder(newData,requireContext(),sharedViewModel.date!!)
+                todoViewModel.insertData(newData,requireContext(),sharedViewModel.date)
                 sharedViewModel.deinitializeSharedVariables()
             Toast.makeText(requireContext(), "Added Successfully!", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_addFragment_to_listFragment)

@@ -8,11 +8,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todo.R
 import com.example.todo.data.TodoViewModel
 import com.example.todo.data.models.CheckListTask
+import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentAddChecklistBinding
 import com.example.todo.fragments.SharedViewModel
 
@@ -24,11 +24,12 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
     private val viewModel: SharedViewModel by viewModels()
 
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentAddChecklistBinding.inflate(layoutInflater, container, false)
-        adapter = CheckListAdapter(ArrayList()){item:CheckListTask->itemClicked(item)}
+        adapter = CheckListAdapter(ArrayList()){itemClicked() }
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.task.setOnTouchListener(this)
@@ -50,14 +51,14 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
         return binding.root
     }
 
-    private fun itemClicked(item: CheckListTask) {
+    private fun itemClicked() {
 
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(p0: View?, event: MotionEvent?): Boolean {
-        if (event?.getAction() == MotionEvent.ACTION_UP) {
-            if (event.getRawX() >= (binding.task.getRight() - binding.task.getCompoundDrawables()[2].getBounds()
+        if (event?.action == MotionEvent.ACTION_UP) {
+            if (event.rawX >= (binding.task.right - binding.task.compoundDrawables[2].bounds
                     .width())
             ) {
                 if (binding.task.text.toString().isEmpty()) {
@@ -89,12 +90,23 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
     private fun saveData() {
         if(binding.titleEt.text.toString().isEmpty() || adapter.listTask.size==0)
             Toast.makeText(requireContext(),"Some required fields are empty!",Toast.LENGTH_SHORT).show()
-        else{
-            todoViewModel.saveData(binding.titleEt.text.toString(),viewModel.parsePriority(binding.prioritiesSpinner.selectedItem.toString()),date,adapter.listTask,viewModel.dateString,requireContext())
-            viewModel.deinitializeSharedVariables()
-            Toast.makeText(requireContext(),"Successfully added ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_addChecklistFragment_to_listFragment)
+        else if(viewModel.date!=null && viewModel.date!!.timeInMillis<System.currentTimeMillis()){
+            Toast.makeText(requireContext(), "Set a later time for reminder!", Toast.LENGTH_SHORT)
+                .show()
         }
+        else {
+            val todo= ToDoData(
+                0,
+                binding.titleEt.text.toString(),
+                viewModel.parsePriority(binding.prioritiesSpinner.selectedItem.toString()),
+                "",
+                date,
+                "",
+                "",
+                "",
+                adapter.listTask,"",viewModel.dateString)
+                todoViewModel.insertData(todo,requireContext(),viewModel.date)
+            }
     }
 
 
