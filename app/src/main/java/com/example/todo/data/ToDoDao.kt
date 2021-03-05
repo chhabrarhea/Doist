@@ -13,7 +13,7 @@ interface ToDoDao {
     fun getData():List<ToDoData>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertData(toDoData: ToDoData)
+    suspend fun insertData(toDoData: ToDoData):Long
 
     @Update
     suspend fun updateData(toDoData: ToDoData)
@@ -23,4 +23,8 @@ interface ToDoDao {
 
     @Query("Delete from todo_table")
     suspend fun deleteAll()
+
+    @Query("Update todo_table set reminder=null where id=:id")
+    suspend fun deleteReminder(id:Int)
+
 }

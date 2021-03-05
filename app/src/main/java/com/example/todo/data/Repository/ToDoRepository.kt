@@ -6,8 +6,8 @@ import com.example.todo.data.models.ToDoData
 class ToDoRepository(private val dao: ToDoDao) {
     val getAllData=dao.getAllData()
 
-    suspend fun insertTodo(toDoData: ToDoData){
-        dao.insertData(toDoData)
+    suspend fun insertTodo(toDoData: ToDoData):Long{
+        return dao.insertData(toDoData)
     }
 
     suspend fun updateData(toDoData: ToDoData){
@@ -20,5 +20,9 @@ class ToDoRepository(private val dao: ToDoDao) {
 
     suspend fun deleteAll(){
         dao.deleteAll()
+    }
+
+    suspend fun deleteReminder(id:Int){
+        dao.deleteReminder(id)
     }
 }

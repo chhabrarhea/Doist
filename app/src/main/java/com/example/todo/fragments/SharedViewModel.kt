@@ -3,6 +3,8 @@ package com.example.todo.fragments
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -17,9 +19,9 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
-import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -41,14 +43,27 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     var listIsEmpty = MutableLiveData<Boolean>()
     var mCurrentPhotoPath = ""
     val fromCamera = 200
+    var date:Calendar?=null
+    var dateString:String?=null
 
+    //data shared by fragments- audio path and canvas path
     companion object{
     var audioRecorded=MutableLiveData("")
     var canvasImage=MutableLiveData("")}
+    @Synchronized fun setCanvasImage(s:String){
+        canvasImage.value=s
+    }
+    @Synchronized fun setCanvasFromBackground(res:String){
+        canvasImage.postValue(res)
+    }
+    @Synchronized fun setRecordAudio(path:String){
+        audioRecorded.value=path
+        Log.i("onO","$path ${audioRecorded.value}")
+    }
 
 
 
-    //constants for permissions and results
+    //permissions and results
     val requiredPermissionForAudioRecord = arrayOf(
         android.Manifest.permission.RECORD_AUDIO,
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -66,6 +81,14 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
     val requestCodeForImagePermissions = 10
+    fun allPermissionsGrantedForImage(context: Context) = requiredPermissionsForImage.all {
+        ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
+    fun allPermissionsGrantedForMic(context: Context)=requiredPermissionForAudioRecord.all {
+        ContextCompat.checkSelfPermission(context,it)== PackageManager.PERMISSION_GRANTED
+    }
+    fun allPermissionsGrantedForAudioPicker(context: Context)=requiredPermissionForAudioPicker.all {
+        ContextCompat.checkSelfPermission(context,it)== PackageManager.PERMISSION_GRANTED
+    }
 
 
 
@@ -86,9 +109,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             } }
         return alert}
 
-    @Synchronized fun setCanvasImage(s:String){
-        canvasImage.value=s
-    }
+
 
     fun validateData(title: String, desc: String): Boolean {
         return if (TextUtils.isEmpty(title) || TextUtils.isEmpty(desc)) {
@@ -96,6 +117,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         } else !(title.isEmpty() || desc.isEmpty())
     }
 
+    //orientation of listFragment RecyclerView
     fun setListOrientation(context: Context, staggered: Boolean) {
         val pref: SharedPreferences =
             context.getSharedPreferences("ToDoOrientation", Context.MODE_PRIVATE)
@@ -103,51 +125,31 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         editor.putBoolean("StaggeredOrientation", staggered)
         editor.apply()
     }
-
     fun getListOrientation(context: Context): Boolean {
         val pref: SharedPreferences =
             context.getSharedPreferences("ToDoOrientation", Context.MODE_PRIVATE)
         return pref.getBoolean("StaggeredOrientation", true)
     }
-   @Synchronized fun setCanvasFromBackground(res:String){
-                 canvasImage.postValue(res)
-    }
-
-
-
-    fun parsePriority(priority: String): Priority {
-        Log.i("prior", priority)
-        return when (priority) {
-            "High Priority" -> Priority.HIGH
-            "Medium Priority" -> Priority.MEDIUM
-            "Low Priority" -> Priority.LOW
-            else -> Priority.LOW
-
-        }
-
-    }
-    fun parsePriorityById(priority: Int): Priority {
-
-        return when (priority) {
-            0-> Priority.HIGH
-            1 -> Priority.MEDIUM
-            2-> Priority.LOW
-            else -> Priority.LOW
-
-        }
-
-    }
-
-    @Synchronized fun setRecordAudio(path:String){
-            audioRecorded.value=path
-        Log.i("onO","$path ${audioRecorded.value}")
-    }
-
     fun checkListIsEmpty(list: List<ToDoData>) {
         listIsEmpty.value = list.isEmpty()
     }
 
 
+
+    //setting UI and extracting data from UI for priority
+    fun parsePriority(priority: String): Priority {
+        return when (priority) {
+            "High Priority" -> Priority.HIGH
+            "Medium Priority" -> Priority.MEDIUM
+            "Low Priority" -> Priority.LOW
+            else -> Priority.LOW } }
+    fun parsePriorityById(priority: Int): Priority {
+        return when (priority) {
+            0-> Priority.HIGH
+            1 -> Priority.MEDIUM
+            2-> Priority.LOW
+            else -> Priority.LOW
+        } }
     fun initializeSpinner(context: Context,priorityIndicator: CardView):OnSpinnerItemSelectedListener{
 
         return OnSpinnerItemSelectedListener { parent, v, position, id ->
@@ -168,7 +170,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
     }
-
     fun initializeSpinnerForCheckList(context: Context):OnSpinnerItemSelectedListener{
         return OnSpinnerItemSelectedListener { parent, v, position, id ->
             parent.setTextAppearance(R.style.textAppearance)
@@ -187,39 +188,8 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
     }
 
-    val listener: AdapterView.OnItemSelectedListener = object :
-        AdapterView.OnItemSelectedListener {
-        override fun onNothingSelected(parent: AdapterView<*>?) {
 
-        }
-        override fun onItemSelected(
-            parent: AdapterView<*>?,
-            view: View?,
-            position: Int,
-            id: Long
-        ) {
-            when (position) {
-                0 -> {
-                    Log.i("itemSelected","${view?.id}  ")
-                    val text = (view as TextView?)
-                    text?.setTextAppearance(R.style.textAppearance)
-                    text?.setTextColor(ContextCompat.getColor(application, R.color.high))
-                }
-                1 -> {
-                    Log.i("itemSelected","${view?.id}  ")
-                    val text = (parent?.getChildAt(0) as TextView?)
-                    text?.setTextAppearance(R.style.textAppearance)
-                    text?.setTextColor(ContextCompat.getColor(application, R.color.medium))
-                }
-                2 -> {
-                    val text = (parent?.getChildAt(0) as TextView?)
-                    text?.setTextAppearance(R.style.textAppearance)
-                    text?.setTextColor(ContextCompat.getColor(application, R.color.low))
-                }
-            }
-        }
-    }
-
+     //setting cameraIntent
     fun openCamera(activity: Activity, context: Context): Intent? {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(activity.packageManager) != null) {
@@ -234,7 +204,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             if (photoFile != null) {
                 val photoURI: Uri = FileProvider.getUriForFile(
                     context,
-                    BuildConfig.APPLICATION_ID + ".provider",
+                     BuildConfig.APPLICATION_ID + ".provider",
                     createImageFile()!!
                 )
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
@@ -243,7 +213,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         }
         return null
     }
-
     @Throws(IOException::class)
     fun createImageFile(): File? {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
@@ -261,8 +230,9 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         mCurrentPhotoPath = image.absolutePath
         return image
     }
-
     @SuppressLint("Recycle")
+
+    //getting path of photo selected from gallery
     fun getRealPathFromURI(contentUri: Uri, context: Activity): String? {
         val proj = arrayOf(MediaStore.Images.Media.DATA)
         val cursor: Cursor? = context.contentResolver.query(
@@ -276,15 +246,56 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         cursor.moveToFirst()
         return cursor.getString(column_index)
     }
+    
+    fun setReminder(context: Context,view:RelativeLayout){
+        val newCalender = Calendar.getInstance();
+        val datePicker= DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                run {
+                    val newDate = Calendar.getInstance()
+                    val newTime = Calendar.getInstance()
+                    val time = TimePickerDialog(
+                        context,
+                        { _, hour, min ->
+                            run {
+                                newDate.set(year, month, day, hour, min)
+                                val tem = Calendar.getInstance()
+                                if (newDate.timeInMillis - tem.timeInMillis > 0) {
+                                    date=newDate
+                                    view.visibility=View.VISIBLE
+                                   val tv=view.getChildAt(1) as TextView
+                                    val df=SimpleDateFormat("MMM dd, h:mm a")
+                                    dateString=df.format(date!!.time)
+                                    tv.text=dateString
+                                } else Toast.makeText(
+                                    context,
+                                    "Invalid time",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }, newTime.get(Calendar.HOUR_OF_DAY), newTime.get(Calendar.MINUTE), true
+                    )
+                    time.show()
+                }
 
-    fun allPermissionsGrantedForImage(context: Context) = requiredPermissionsForImage.all {
-        ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
-    fun allPermissionsGrantedForMic(context: Context)=requiredPermissionForAudioRecord.all {
-        ContextCompat.checkSelfPermission(context,it)== PackageManager.PERMISSION_GRANTED
-    }
-    fun allPermissionsGrantedForAudioPicker(context: Context)=requiredPermissionForAudioPicker.all {
-        ContextCompat.checkSelfPermission(context,it)== PackageManager.PERMISSION_GRANTED
+            }, newCalender.get(Calendar.YEAR), newCalender.get(Calendar.MONTH), newCalender.get(
+                Calendar.DAY_OF_MONTH
+            )
+        )
+        datePicker.datePicker.minDate = System.currentTimeMillis()
+        datePicker.show()
     }
 
+    fun deinitializeSharedVariables(){
+        canvasImage.value=""
+        audioRecorded.value=""
+        date=null
+        dateString=null
+    }
+    fun removeReminderDialog(context: Context,view:RelativeLayout){
+
+    }
+    
 
 }

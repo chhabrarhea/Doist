@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.Toast
@@ -42,24 +41,28 @@ class AddFragment : Fragment(){
     ): View {
         view = FragmentAddBinding.inflate(inflater, container, false)
 
-
         setHasOptionsMenu(true)
         (activity as AppCompatActivity?)!!.setSupportActionBar(view.toolbar)
         view.toolbar.overflowIcon= ContextCompat.getDrawable(
             requireContext(),
-            R.drawable.ic_baseline_attach_file_24)
-        view.priorityIndicator.setCardBackgroundColor(ContextCompat.getColor(requireContext(),R.color.high))
-        view.prioritiesSpinner.onSpinnerItemSelectedListener = sharedViewModel.initializeSpinner(requireContext(),view.priorityIndicator)
+            R.drawable.ic_baseline_attach_file_24
+        )
 
-        mediaPlayerLifeCycle= MediaPlayerLifeCycle(view.mediaPlayer,requireContext(),"")
+        view.prioritiesSpinner.onSpinnerItemSelectedListener = sharedViewModel.initializeSpinner(
+            requireContext(),
+            view.priorityIndicator
+        )
+
+        mediaPlayerLifeCycle= MediaPlayerLifeCycle(view.mediaPlayer, requireContext(), "")
         if(mediaPlayerLifeCycle.audioFilePath!="" && SharedViewModel.audioRecorded.value=="")
             sharedViewModel.setRecordAudio("")
         SharedViewModel.audioRecorded.observe(viewLifecycleOwner, {
-            if(it!="") mediaPlayerLifeCycle.initializeMediaPlayer(it)})
-        SharedViewModel.canvasImage.observe(viewLifecycleOwner,{
-            if(it!=""){
-                canvasPath=it
-                setImage(it,view.canvasImage,view.deleteCanvas)
+            if (it != "") mediaPlayerLifeCycle.initializeMediaPlayer(it)
+        })
+        SharedViewModel.canvasImage.observe(viewLifecycleOwner, {
+            if (it != "") {
+                canvasPath = it
+                setImage(it, view.canvasImage, view.deleteCanvas)
             }
         })
 
@@ -67,31 +70,23 @@ class AddFragment : Fragment(){
         view.deleteUrl.setOnClickListener { removeUrl() }
         view.deleteAudio.setOnClickListener { removeMediaPlayer() }
         view.deleteCanvas.setOnClickListener { removeCanvasImage() }
-        return view.root
+        view.reminderLayout.setOnClickListener {
+            val alertDialog=AlertDialog.Builder(requireContext())
+            alertDialog.setTitle("Cancel Reminder?")
+            alertDialog.setPositiveButton("Yes"){_,_->run{
+                view.reminderLayout.visibility=View.GONE
+                sharedViewModel.date=null
+                sharedViewModel.dateString=null
+            }}
+            alertDialog.setNegativeButton("No",null)
+            alertDialog.create().show()}
+        return view.root }
 
-    }
-
-    private fun setImage(it: String?,image:ImageView,button:FloatingActionButton) {
+    //sets Image in imageView using Glide
+    private fun setImage(it: String?, image: ImageView, button: FloatingActionButton) {
         Glide.with(requireContext()).load(it).into(image)
         image.visibility=View.VISIBLE
         button.visibility=View.VISIBLE
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.add_fragment_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.menu_add -> insertData()
-            R.id.menu_add_image -> addImage()
-            R.id.add_url -> addURL()
-            R.id.menu_add_vn -> addVn()
-            R.id.canvas->{
-                findNavController().navigate(R.id.action_addFragment_to_drawFragment)
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun addVn() {
@@ -121,10 +116,6 @@ class AddFragment : Fragment(){
 
     }
 
-    private fun addURL() {
-        sharedViewModel.urlDialog(requireContext(),layoutInflater,view.url).show()
-    }
-
     private fun addImage() {
         if(!sharedViewModel.allPermissionsGrantedForImage(requireContext())){
                requestPermissions(
@@ -135,7 +126,6 @@ class AddFragment : Fragment(){
             dialogForImage()
         }
     }
-
     private fun dialogForImage(){
         val dialog=AlertDialog.Builder(requireContext())
         dialog.setTitle("Add Image").setMessage("Capture from Camera or Upload from Gallery")
@@ -143,66 +133,72 @@ class AddFragment : Fragment(){
         dialog.setPositiveButton("Camera"){ _, _ -> openCamera()}
         dialog.create().show()
     }
-
     private fun openCamera() {
         val intent=sharedViewModel.openCamera(requireActivity(), requireContext())
         if(intent==null)
-            Toast.makeText(requireContext(), "Some error occured!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Some error occurred!", Toast.LENGTH_SHORT).show()
         else
             startActivityForResult(intent, sharedViewModel.fromCamera)
     }
-
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, sharedViewModel.fromGallery)
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if(resultCode==RESULT_OK){
             if (requestCode==sharedViewModel.fromCamera){
-               setImage(sharedViewModel.mCurrentPhotoPath,view.image,view.deleteImage)
+               setImage(sharedViewModel.mCurrentPhotoPath, view.image, view.deleteImage)
             }
             else if(requestCode==sharedViewModel.fromGallery && data!=null){
                 val path=sharedViewModel.getRealPathFromURI(data.data!!, requireActivity())
                 if(path!=null){
                     sharedViewModel.mCurrentPhotoPath=path
-                    setImage(sharedViewModel.mCurrentPhotoPath,view.image,view.deleteImage)
+                    setImage(sharedViewModel.mCurrentPhotoPath, view.image, view.deleteImage)
                 }
             }
             else if(requestCode==77 && data!=null){
                 val uri: Uri =data.data!!
-                val path: String? = sharedViewModel.getRealPathFromURI(uri,requireActivity())
+                val path: String? = sharedViewModel.getRealPathFromURI(uri, requireActivity())
                 if(path!=null){
                     sharedViewModel.setRecordAudio(path)
                 }
                 else{
-                    Toast.makeText(requireContext(),"Some error occured, try again!",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Some error occured, try again!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }}}
     }
 
     private fun insertData() {
+
         val title = view.titleEt.text.toString()
         val priority = view.prioritiesSpinner.selectedIndex
         val desc = view.descriptionEt.text.toString()
 
-        if (sharedViewModel.validateData(title, desc)) {
+        if (sharedViewModel.validateData(title, desc) && (sharedViewModel.date==null || sharedViewModel.date!!.timeInMillis>System.currentTimeMillis())) {
             val newData = ToDoData(
                 0,
                 title,
                 sharedViewModel.parsePriorityById(priority),
                 desc,
                 view.timeText.text.toString(),
-                sharedViewModel.mCurrentPhotoPath,mediaPlayerLifeCycle.audioFilePath,
-                view.urlText.text.toString(),null,canvasPath
+                sharedViewModel.mCurrentPhotoPath, mediaPlayerLifeCycle.audioFilePath,
+                view.urlText.text.toString(), null, canvasPath,sharedViewModel.dateString
             )
-            todoViewModel.insertData(newData,requireContext())
-            sharedViewModel.setRecordAudio("")
-            sharedViewModel.setCanvasImage("")
+            if (sharedViewModel.date==null)
+                todoViewModel.insertData(newData,requireContext())
+            else
+                todoViewModel.insertDataAndSetReminder(newData,requireContext(),sharedViewModel.date!!)
+                sharedViewModel.deinitializeSharedVariables()
             Toast.makeText(requireContext(), "Added Successfully!", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_addFragment_to_listFragment)
-        } else {
+        }else if (sharedViewModel.date!=null && sharedViewModel.date!!.timeInMillis<System.currentTimeMillis())
+            Toast.makeText(requireContext(), "Please enter a later time for reminder!", Toast.LENGTH_LONG).show()
+        else {
             Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
         }
     }
@@ -210,27 +206,37 @@ class AddFragment : Fragment(){
     override fun onPrepareOptionsMenu(menu: Menu) {
         if (menu.javaClass.simpleName == "MenuBuilder") {
             try {
-
-                val m: Method = menu.javaClass.getDeclaredMethod("setOptionalIconsVisible", java.lang.Boolean.TYPE
+                val m: Method = menu.javaClass.getDeclaredMethod(
+                    "setOptionalIconsVisible",
+                    java.lang.Boolean.TYPE
                 )
                 m.isAccessible = true
                 m.invoke(menu, true)
-            } catch (e: Exception) {
-                Log.e(
-                    javaClass.simpleName,
-                    "onMenuOpened...unable to set icons for overflow menu",
-                    e
-                )
-            }
+            } catch (e: Exception) {}
         }
         super.onPrepareOptionsMenu(menu)
+    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.add_fragment_menu, menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.menu_add -> insertData()
+            R.id.menu_add_image -> addImage()
+            R.id.add_url -> sharedViewModel.urlDialog(requireContext(), layoutInflater, view.url).show()
+            R.id.menu_add_vn -> addVn()
+            R.id.canvas -> findNavController().navigate(R.id.action_addFragment_to_drawFragment)
+            R.id.reminder -> sharedViewModel.setReminder(requireContext(),view.reminderLayout)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray) {
+        grantResults: IntArray
+    ) {
         when(requestCode){
             sharedViewModel.requestCodeForImagePermissions -> {
                 if (sharedViewModel.allPermissionsGrantedForImage(requireContext())) {
@@ -261,21 +267,19 @@ class AddFragment : Fragment(){
 
     }
 
+
     private fun removeImage(){
         view.deleteImage.visibility=View.GONE
         view.image.visibility=View.GONE
         sharedViewModel.mCurrentPhotoPath=""
     }
-
     private fun removeUrl(){
        view.urlText.text=""
        view.url.visibility=View.VISIBLE
     }
-
     private fun removeMediaPlayer(){
         mediaPlayerLifeCycle.removeMediaPlayer()
         sharedViewModel.setRecordAudio("") }
-
     private fun removeCanvasImage(){
         sharedViewModel.setCanvasImage("")
         view.canvasImage.visibility=View.GONE
@@ -287,7 +291,6 @@ class AddFragment : Fragment(){
         mediaPlayerLifeCycle.stopMediaPlayer()
          sharedViewModel.setRecordAudio("")
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         mediaPlayerLifeCycle.destroyMediaPlayer()

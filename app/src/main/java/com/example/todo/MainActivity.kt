@@ -12,9 +12,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         if(intent.getParcelableExtra<ToDoData>(NewAppWidget().EXTRA_LABEL)!=null){
             val obj=intent.getParcelableExtra<ToDoData>(NewAppWidget().EXTRA_LABEL)
-            Log.i("activity", obj!!.title)
 
-            if (obj.description!=""){
+            if (obj!!.description!=""){
                 val bundle=Bundle()
                 bundle.putParcelable("currentItem",obj)
             findNavController(R.id.navHostFragment)

@@ -52,7 +52,7 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
             binding.recordButton.isEnabled = false;
             Toast.makeText(requireContext(), "No microphone found!", Toast.LENGTH_SHORT).show();
         } else {
-            binding.stopButton.setEnabled(false)
+            binding.stopButton.isEnabled = false
             file = File(requireContext().getExternalFilesDir(null)?.absolutePath, "DoIt")
             if (!file.exists()) file.mkdir()
             audioFilePath =
@@ -181,7 +181,7 @@ class RecordAudioFragment : Fragment(),MediaPlayer.OnCompletionListener, SeekBar
             mediaPlayer!!.setDataSource(inputStream.getFD())
             inputStream.close()
             mediaPlayer!!.prepare()
-            mediaPlayer!!.setOnPreparedListener { mp: MediaPlayer? ->
+            mediaPlayer!!.setOnPreparedListener {
                 initializeSeekBar()
                 mediaPlayer!!.start()
                 anim=binding.playButton.drawable as Animatable

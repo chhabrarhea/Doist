@@ -1,4 +1,4 @@
-package com.example.todo.Utils;
+package com.example.todo.utils;
 
 public  class  Constants {
     static String audioFilePath="";

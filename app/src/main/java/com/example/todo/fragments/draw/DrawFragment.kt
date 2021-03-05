@@ -2,21 +2,21 @@ package com.example.todo.fragments.draw
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.media.MediaScannerConnection
 import android.os.Bundle
-import android.content.Intent
 import android.view.*
 import android.widget.Button
-import androidx.fragment.app.Fragment
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.todo.R
@@ -25,13 +25,11 @@ import com.example.todo.fragments.SharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.util.jar.Manifest
 
-@Suppress("BlockingMethodInNonBlockingContext")
+@Suppress("BlockingMethodInNonBlockingContext", "KDocUnresolvedReference")
 class DrawFragment : Fragment(){
 private lateinit var binding:FragmentDrawBinding
 private lateinit var sheetBehavior:BottomSheetBehavior<CardView>
@@ -101,7 +99,7 @@ private val sharedViewModel:SharedViewModel by viewModels()
             R.id.share->shareDrawing()
             R.id.undo->binding.canvas.undoPath()
             R.id.redo->binding.canvas.redoPath()
-            R.id.save->saveBitmap()
+            R.id.save->saveImageAndNavigate()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -131,7 +129,7 @@ private val sharedViewModel:SharedViewModel by viewModels()
             saveBitmap()}
         MediaScannerConnection.scanFile(
             requireContext(), arrayOf(SharedViewModel.canvasImage.value), null
-        ) { path, uri ->
+        ) { _, uri ->
             // This is used for sharing the image after it has being stored in the storage.
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND

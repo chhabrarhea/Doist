@@ -1,4 +1,4 @@
-package com.example.todo.data.Repository
+package com.example.todo.data
 
 import androidx.room.TypeConverter
 import com.example.todo.data.models.CheckListTask

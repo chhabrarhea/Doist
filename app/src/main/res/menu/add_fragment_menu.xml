@@ -25,6 +25,11 @@
         android:id="@+id/canvas"
         android:title="Draw"
         android:icon="@drawable/ic_baseline_brush_24"/>
+    <item
+        android:id="@+id/reminder"
+        android:icon="@drawable/ic_baseline_access_alarm_24"
+        android:title="Set Reminder"
+        app:showAsAction="always"/>
 
 
 </menu>

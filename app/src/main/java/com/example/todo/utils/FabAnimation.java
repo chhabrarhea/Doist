@@ -1,4 +1,4 @@
-package com.example.todo.Utils;
+package com.example.todo.utils;
 
 import android.animation.Animator;
 import android.view.View;

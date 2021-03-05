@@ -1,9 +1,8 @@
 package com.example.todo.data.models
 
 import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import kotlinx.android.parcel.Parcelize
+
 
 @Parcelize
-class CheckListTask(var task:String,var done:Boolean):Parcelable{
-
-}
+class CheckListTask(var task:String,var done:Boolean):Parcelable

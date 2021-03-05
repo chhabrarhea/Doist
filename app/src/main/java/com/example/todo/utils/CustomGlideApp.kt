@@ -1,4 +1,4 @@
-package com.example.todo.Utils
+package com.example.todo.utils
 
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule

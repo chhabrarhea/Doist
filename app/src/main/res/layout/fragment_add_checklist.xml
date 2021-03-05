@@ -42,14 +42,54 @@
             android:textColor="@color/design_default_color_on_secondary"
             android:textStyle="bold"
             android:importantForAutofill="no" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="23dp"
-            android:layout_marginTop="4dp"
-            android:textStyle="italic"
-            android:getCurrentTime="@{true}"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_below="@id/title_et"
-            android:id="@+id/time_text"/>
+            android:id="@+id/timeLayout"
+            android:layout_height="25dp"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textStyle="italic"
+                android:id="@+id/time_text"
+                tools:text="27th Dec 2020"
+                android:getCurrentTime="@{true}"
+                />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="8dp"
+                android:layout_marginStart="5dp"
+                android:visibility="gone"
+                android:id="@+id/reminderLayout"
+                android:background="@drawable/media_player_background"
+                android:backgroundTint="@color/lightGray">
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:clickable="false"
+                    android:layout_centerVertical="true"
+                    android:contentDescription="@string/alarm"
+                    android:src="@drawable/ic_baseline_access_alarm_24"
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/alarm"
+                    app:tint="@color/darkGray" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:clickable="false"
+                    android:id="@+id/reminderText"
+                    android:layout_marginStart="6dp"
+                    android:layout_toEndOf="@id/alarm"
+                    android:textColor="@color/darkGray"
+                    android:layout_centerInParent="true"
+                    tools:text="20 Mar,1800"/>
+            </RelativeLayout>
+
+        </LinearLayout>
         <org.angmarch.views.NiceSpinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,12 +99,12 @@
             android:textStyle="bold"
             android:setList="@{true}"
             android:id="@+id/priorities_spinner"
-            android:layout_below="@id/time_text" />
+            android:layout_below="@id/timeLayout" />
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/nameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Task"
+            android:hint="@string/task"
             android:layout_below="@id/priorities_spinner"
             app:boxStrokeColor="@color/primaryDarkColor"
             app:hintEnabled="true"

@@ -1,5 +1,6 @@
-package com.example.todo.Utils
+package com.example.todo.utils
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
@@ -32,7 +33,7 @@ class DataBindingAdapters {
 
     companion object {
         private var lastTouchDown: Long = 0
-        private val CLICK_ACTION_THRESHOLD = 200
+        private const val CLICK_ACTION_THRESHOLD = 200
 
         @BindingAdapter("android:navigateToAddFragment")
         @JvmStatic
@@ -174,8 +175,8 @@ class DataBindingAdapters {
         @BindingAdapter("android:LoadImageWithGlide")
         @JvmStatic
         fun loadImageWithGlide(view: RelativeLayout, path: String) {
-            val imageView=view.findViewById(R.id.image) as ImageView
-            if (!path.equals("")) {
+            val imageView=view.getChildAt(0) as ImageView
+            if (path != "") {
                 GlideApp.with(view.context).load(path).listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
@@ -217,7 +218,7 @@ class DataBindingAdapters {
         @JvmStatic
         fun loadImage(view: ImageView, path: String) {
             Log.i("glide", path)
-            if (!path.equals("")) {
+            if (path != "") {
                 GlideApp.with(view.context).load(path).listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
@@ -245,31 +246,29 @@ class DataBindingAdapters {
             }
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         @BindingAdapter("android:navigateToUpdateCheckListFragment")
         @JvmStatic
         fun navigateToUpdateCheckListFragment(view: View, currentList: ToDoData) {
             if (view is RecyclerView) {
-                view.setOnTouchListener(object : View.OnTouchListener {
-                    override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-                        when (p1?.action) {
-                            MotionEvent.ACTION_DOWN -> {
-                                lastTouchDown = System.currentTimeMillis()
-                            }
-                            MotionEvent.ACTION_UP -> {
-                                if (System.currentTimeMillis() - lastTouchDown <= CLICK_ACTION_THRESHOLD) {
-                                    val bundle = Bundle()
-                                    bundle.putParcelable("currentList", currentList)
-                                    view.findNavController().navigate(
-                                        R.id.action_listFragment_to_updateCheckListFragment,
-                                        bundle
-                                    )
-                                }
+                view.setOnTouchListener { p0, p1 ->
+                    when (p1?.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            lastTouchDown = System.currentTimeMillis()
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            if (System.currentTimeMillis() - lastTouchDown <= CLICK_ACTION_THRESHOLD) {
+                                val bundle = Bundle()
+                                bundle.putParcelable("currentList", currentList)
+                                view.findNavController().navigate(
+                                    R.id.action_listFragment_to_updateCheckListFragment,
+                                    bundle
+                                )
                             }
                         }
-                        return p0?.onTouchEvent(p1) ?: true
                     }
-
-                })
+                    p0?.onTouchEvent(p1) ?: true
+                }
             } else {
                 view.setOnClickListener {
                     val bundle = Bundle()
@@ -303,6 +302,17 @@ class DataBindingAdapters {
             if (isAddFragment) {
                 view.selectedIndex = 0
                 view.setTextColor(ContextCompat.getColor(view.context, R.color.high))
+            }
+        }
+
+        @BindingAdapter("android:setReminder")
+        @JvmStatic
+        fun setReminder(view:RelativeLayout,date:String?){
+            if(date!=null){
+                val tv=view.getChildAt(1) as TextView
+                tv.text=date
+                view.visibility=View.VISIBLE
+
             }
         }
 

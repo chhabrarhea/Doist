@@ -1,24 +1,20 @@
 package com.example.todo.fragments.checklist
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
-import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todo.R
 import com.example.todo.data.TodoViewModel
 import com.example.todo.data.models.CheckListTask
-import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentAddChecklistBinding
 import com.example.todo.fragments.SharedViewModel
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
 class AddChecklistFragment : Fragment(), View.OnTouchListener {
     private lateinit var binding: FragmentAddChecklistBinding
@@ -30,7 +26,7 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentAddChecklistBinding.inflate(layoutInflater, container, false)
         adapter = CheckListAdapter(ArrayList()){item:CheckListTask->itemClicked(item)}
         binding.recyclerView.adapter = adapter
@@ -40,6 +36,17 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
         (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
 
         binding.prioritiesSpinner.onSpinnerItemSelectedListener=viewModel.initializeSpinnerForCheckList(requireContext())
+
+        binding.reminderLayout.setOnClickListener {
+            val alertDialog= AlertDialog.Builder(requireContext())
+            alertDialog.setTitle("Cancel Reminder?")
+            alertDialog.setPositiveButton("Yes"){_,_->run{
+                binding.reminderLayout.visibility=View.GONE
+                viewModel.dateString=null
+                viewModel.date=null
+            }}
+            alertDialog.setNegativeButton("No",null)
+            alertDialog.create().show()}
         return binding.root
     }
 
@@ -47,6 +54,7 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(p0: View?, event: MotionEvent?): Boolean {
         if (event?.getAction() == MotionEvent.ACTION_UP) {
             if (event.getRawX() >= (binding.task.getRight() - binding.task.getCompoundDrawables()[2].getBounds()
@@ -67,12 +75,13 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.record_audio_fragment_menu,menu)
+        inflater.inflate(R.menu.add_checklist_menu,menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.menu_save->saveData()
+            R.id.reminder->viewModel.setReminder(requireContext(),binding.reminderLayout)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -81,7 +90,8 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
         if(binding.titleEt.text.toString().isEmpty() || adapter.listTask.size==0)
             Toast.makeText(requireContext(),"Some required fields are empty!",Toast.LENGTH_SHORT).show()
         else{
-            todoViewModel.saveData(binding.titleEt.text.toString(),viewModel.parsePriority(binding.prioritiesSpinner.selectedItem.toString()),date,adapter.listTask,requireContext())
+            todoViewModel.saveData(binding.titleEt.text.toString(),viewModel.parsePriority(binding.prioritiesSpinner.selectedItem.toString()),date,adapter.listTask,viewModel.dateString,requireContext())
+            viewModel.deinitializeSharedVariables()
             Toast.makeText(requireContext(),"Successfully added ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_addChecklistFragment_to_listFragment)
         }
