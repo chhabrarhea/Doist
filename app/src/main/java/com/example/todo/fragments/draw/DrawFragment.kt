@@ -104,29 +104,39 @@ private val sharedViewModel:SharedViewModel by viewModels()
         return super.onOptionsItemSelected(item)
     }
 
-    private fun saveBitmap() {
+    private fun saveBitmap(i:Int) {
         if(!checkForPermission())
-           requestPermissions(arrayOf(permission), permissionCode)
+            requestPermissions(arrayOf(permission), permissionCode)
         else{
-           CoroutineScope(IO).launch{
-               val a=async(IO) {
-                   saveImage(getBitmapFromView(binding.canvas))
-               }
-               sharedViewModel.setCanvasFromBackground(a.await())
-              isSaved=true
-       }}
+            CoroutineScope(IO).launch{
+                val a=async(IO) {
+                    saveImage(getBitmapFromView(binding.canvas))
+                }
+                sharedViewModel.setCanvasFromBackground(a.await())
+                isSaved=true
+                a.invokeOnCompletion {
+                   if(i==1)
+                       saveImageAndNavigate()
+                    else
+                        shareDrawing()
+                }}
+
+        }
+
     }
 
     private fun saveImageAndNavigate(){
         if(!isSaved){
-        saveBitmap()}
-        findNavController().popBackStack()
+            saveBitmap(1) }
+        else{
+        findNavController().popBackStack()}
     }
 
 
     private fun shareDrawing() {
         if(!isSaved){
-            saveBitmap()}
+            saveBitmap(2)}
+        else{
         MediaScannerConnection.scanFile(
             requireContext(), arrayOf(SharedViewModel.canvasImage.value), null
         ) { _, uri ->
@@ -149,7 +159,7 @@ private val sharedViewModel:SharedViewModel by viewModels()
             // This can be used as an alternative to the standard activity picker
             // that is displayed by the system when you try to start an activity with multiple possible matches,
             // with these differences in behavior:
-        }
+        }}
     }
 
     private fun openGridDialog() {

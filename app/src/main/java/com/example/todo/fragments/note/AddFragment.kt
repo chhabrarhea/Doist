@@ -294,4 +294,9 @@ class AddFragment : Fragment(){
         super.onDestroyView()
         mediaPlayerLifeCycle.destroyMediaPlayer()
     }
+
+    override fun onDetach() {
+        super.onDetach()
+        sharedViewModel.deinitializeSharedVariables()
+    }
 }

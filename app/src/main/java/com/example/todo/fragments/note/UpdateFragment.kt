@@ -42,6 +42,7 @@ class UpdateFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.i("update","created")
         view = FragmentUpdateBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
         args = requireArguments().getParcelable("currentItem")!!
@@ -61,7 +62,9 @@ class UpdateFragment : Fragment() {
         SharedViewModel.canvasImage.observe(viewLifecycleOwner,{
             Log.i("s",it)
             if(it!=""){
+
                 canvasPath=it
+                Log.i("s",canvasPath)
                 setImage(it,view.canvas,view.deleteCanvas)
             } })
 
@@ -278,6 +281,11 @@ class UpdateFragment : Fragment() {
         else {
             Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        sharedViewModel.deinitializeSharedVariables()
     }
 
     private fun removeImage() {
