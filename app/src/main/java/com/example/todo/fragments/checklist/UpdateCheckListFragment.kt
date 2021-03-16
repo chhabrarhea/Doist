@@ -68,6 +68,7 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
                     binding.nameLayout.error = "Cannot be Empty"
                 } else {
                     binding.nameLayout.isErrorEnabled = false
+                    binding.task.setText("")
                     val task = CheckListTask(binding.task.text.toString(), false)
                     adapter.addItem(task)
                 }

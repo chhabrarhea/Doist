@@ -57,8 +57,9 @@ class UpdateFragment : Fragment() {
         })
 
         if(SharedViewModel.canvasImage.value=="" && args.canvasPath!="")
-            sharedViewModel.setCanvasImage("")
+            sharedViewModel.setCanvasImage(args.canvasPath)
         SharedViewModel.canvasImage.observe(viewLifecycleOwner,{
+            Log.i("s",it)
             if(it!=""){
                 canvasPath=it
                 setImage(it,view.canvas,view.deleteCanvas)

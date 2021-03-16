@@ -38,17 +38,20 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
 
         binding.prioritiesSpinner.onSpinnerItemSelectedListener=viewModel.initializeSpinnerForCheckList(requireContext())
 
-        binding.reminderLayout.setOnClickListener {
-            val alertDialog= AlertDialog.Builder(requireContext())
-            alertDialog.setTitle("Cancel Reminder?")
-            alertDialog.setPositiveButton("Yes"){_,_->run{
-                binding.reminderLayout.visibility=View.GONE
-                viewModel.dateString=null
-                viewModel.date=null
-            }}
-            alertDialog.setNegativeButton("No",null)
-            alertDialog.create().show()}
+        binding.reminderLayout.setOnClickListener {deleteReminder()}
         return binding.root
+    }
+
+    private fun deleteReminder() {
+        val alertDialog= AlertDialog.Builder(requireContext())
+        alertDialog.setTitle("Cancel Reminder?")
+        alertDialog.setPositiveButton("Yes"){_,_->run{
+            binding.reminderLayout.visibility=View.GONE
+            viewModel.dateString=null
+            viewModel.date=null
+        }}
+        alertDialog.setNegativeButton("No",null)
+        alertDialog.create().show()
     }
 
     private fun itemClicked() {
@@ -66,7 +69,9 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
                     binding.nameLayout.error = "Cannot be Empty"
                 } else {
                     binding.nameLayout.isErrorEnabled = false
+                    binding.task.setText("")
                     val task = CheckListTask(binding.task.text.toString(), false)
+                    binding.task.clearComposingText()
                     adapter.addItem (task)
                 }
                 return true
@@ -108,6 +113,8 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
                 todoViewModel.insertData(todo,requireContext(),viewModel.date)
             }
     }
+
+
 
 
 }
