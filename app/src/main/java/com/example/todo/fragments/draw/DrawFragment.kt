@@ -8,7 +8,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.ImageView
@@ -16,6 +18,7 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -32,12 +35,11 @@ import java.io.FileOutputStream
 @Suppress("BlockingMethodInNonBlockingContext", "KDocUnresolvedReference")
 class DrawFragment : Fragment(){
 private lateinit var binding:FragmentDrawBinding
+
 private lateinit var sheetBehavior:BottomSheetBehavior<CardView>
 private val sharedViewModel:SharedViewModel by viewModels()
+
     private var isSaved=false
-
-
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding= FragmentDrawBinding.inflate(layoutInflater,container,false)
         sheetBehavior=BottomSheetBehavior.from(binding.bottomSheet)
@@ -84,11 +86,6 @@ private val sharedViewModel:SharedViewModel by viewModels()
             }
         })
     }
-
-
-
-
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.draw_fragment_menu,menu)
     }
@@ -113,8 +110,10 @@ private val sharedViewModel:SharedViewModel by viewModels()
                     saveImage(getBitmapFromView(binding.canvas))
                 }
                 sharedViewModel.setCanvasFromBackground(a.await())
-                isSaved=true
+
                 a.invokeOnCompletion {
+                    isSaved=true
+
                    if(i==1)
                        saveImageAndNavigate()
                     else
@@ -129,6 +128,7 @@ private val sharedViewModel:SharedViewModel by viewModels()
         if(!isSaved){
             saveBitmap(1) }
         else{
+
         findNavController().popBackStack()}
     }
 
@@ -137,29 +137,15 @@ private val sharedViewModel:SharedViewModel by viewModels()
         if(!isSaved){
             saveBitmap(2)}
         else{
-        MediaScannerConnection.scanFile(
-            requireContext(), arrayOf(SharedViewModel.canvasImage.value), null
-        ) { _, uri ->
             // This is used for sharing the image after it has being stored in the storage.
-            val shareIntent = Intent()
-            shareIntent.action = Intent.ACTION_SEND
+            val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.putExtra(
                 Intent.EXTRA_STREAM,
-                uri
-            ) // A content: URI holding a stream of data associated with the Intent, used to supply the data being sent.
-            shareIntent.type =
-                "image/jpeg" // The MIME type of the data being handled by this intent.
-            startActivity(
-                Intent.createChooser(
-                    shareIntent,
-                    "Share"
-                )
-            )// Activity Action: Display an activity chooser,
-            // allowing the user to pick what they want to before proceeding.
-            // This can be used as an alternative to the standard activity picker
-            // that is displayed by the system when you try to start an activity with multiple possible matches,
-            // with these differences in behavior:
-        }}
+                FileProvider.getUriForFile(requireContext(),requireContext().applicationContext.packageName+".provider",File(SharedViewModel.canvasImage.value!!))
+            )
+            shareIntent.type = "image/*"
+            startActivity(shareIntent)
+        }
     }
 
     private fun openGridDialog() {

@@ -11,11 +11,12 @@
     <color name="secondaryLightColor">#ffd558</color>
 
     <color name="secondaryDarkColor">#b77500</color>
-
-    <color name="primaryTextColor">#000000</color>
-
+<color name="primaryBackground">#fff</color>
+    <color name="primaryTextColor">#4B4B4B</color>
+    <color name="titleTextColor">#000</color>
     <color name="secondaryTextColor">#000000</color>
     <color name="white">#FFFFFF</color>
+
     <color name="lightGray">#E6E6E6</color>
     <color name="darkGray">#4B4B4B</color>
     <color name="high">#081d58</color>

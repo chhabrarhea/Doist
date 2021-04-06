@@ -24,6 +24,7 @@ import com.example.todo.data.models.Priority
 import com.example.todo.data.models.ToDoData
 import com.example.todo.fragments.list.ListFragmentDirections
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputLayout
 import org.angmarch.views.NiceSpinner
 import java.text.SimpleDateFormat
 import java.util.*
@@ -74,25 +75,27 @@ class DataBindingAdapters {
 
         @BindingAdapter("android:getPriorityId")
         @JvmStatic
-        fun getPriorityId(v: RelativeLayout, priority: Priority) {
+        fun getPriorityId(v: View, priority: Priority) {
+            val context=v.context
             val spinner = v.findViewById(R.id.current_priorities_spinner) as NiceSpinner
             val card = v.findViewById(R.id.priority_indicator) as CardView
             setList(spinner,false)
+            spinner.setBackgroundColor(ContextCompat.getColor(context,R.color.primaryBackground))
             when (priority) {
                 Priority.HIGH -> {
                     spinner.selectedIndex = 0
-                    spinner.setTextColor(ContextCompat.getColor(v.context, R.color.high))
-                    card.setCardBackgroundColor(ContextCompat.getColor(v.context, R.color.high))
+                    spinner.setTextColor(ContextCompat.getColor(context, R.color.high))
+                    card.setCardBackgroundColor(ContextCompat.getColor(context, R.color.high))
                 }
                 Priority.LOW -> {
                     spinner.selectedIndex = 2
-                    spinner.setTextColor(ContextCompat.getColor(v.context, R.color.low))
-                    card.setCardBackgroundColor(ContextCompat.getColor(v.context, R.color.low))
+                    spinner.setTextColor(ContextCompat.getColor(context, R.color.low))
+                    card.setCardBackgroundColor(ContextCompat.getColor(context, R.color.low))
                 }
                 Priority.MEDIUM -> {
                     spinner.selectedIndex = 1
-                    spinner.setTextColor(ContextCompat.getColor(v.context, R.color.medium))
-                    card.setCardBackgroundColor(ContextCompat.getColor(v.context, R.color.medium))
+                    spinner.setTextColor(ContextCompat.getColor(context, R.color.medium))
+                    card.setCardBackgroundColor(ContextCompat.getColor(context, R.color.medium))
                 }
             }
         }
@@ -101,63 +104,41 @@ class DataBindingAdapters {
         @BindingAdapter("android:getPriorityColor")
         @JvmStatic
         fun getPriorityColor(priorityIndicator: View, priority: Priority) {
-            if (priorityIndicator is CardView) {
-                when (priority) {
-                    Priority.HIGH -> priorityIndicator.setCardBackgroundColor(
-                        ContextCompat.getColor(
-                            priorityIndicator.context,
-                            R.color.high
-                        )
-                    )
-                    Priority.MEDIUM -> priorityIndicator.setCardBackgroundColor(
-                        ContextCompat.getColor(
-                            priorityIndicator.context,
-                            R.color.medium
-                        )
-                    )
-                    Priority.LOW -> priorityIndicator.setCardBackgroundColor(
-                        ContextCompat.getColor(
-                            priorityIndicator.context,
-                            R.color.low
-                        )
-                    )
-                }
-            } else if (priorityIndicator is NiceSpinner) {
-                Log.i("priority",priority.name)
-                priorityIndicator.setTextAppearance(R.style.textAppearance)
-                when (priority) {
-                    Priority.HIGH -> {
-                        Log.i("priority","high")
-                        priorityIndicator.setTextColor(
-                            ContextCompat.getColor(
-                                priorityIndicator.context,
-                                R.color.high
-                            )
-                        )
-                        priorityIndicator.selectedIndex = 0
-                    }
-                    Priority.MEDIUM -> {
-                        Log.i("priority","medium")
-                        priorityIndicator.setTextColor(
-                            ContextCompat.getColor(
-                                priorityIndicator.context,
-                                R.color.medium
-                            )
-                        )
-                        priorityIndicator.selectedIndex = 1
-                    }
-                    Priority.LOW -> {
-                        Log.i("priority","low")
-                        priorityIndicator.setTextColor(
-                            ContextCompat.getColor(
-                                priorityIndicator.context,
-                                R.color.low
-                            )
-                        )
-                        priorityIndicator.selectedIndex = 2
+            val context=priorityIndicator.context
+            val high=ContextCompat.getColor(context, R.color.high)
+            val medium=ContextCompat.getColor(context, R.color.medium)
+            val low=ContextCompat.getColor(context, R.color.low)
+            when (priorityIndicator) {
+                is CardView -> {
+                    when (priority) {
+                        Priority.HIGH -> priorityIndicator.setCardBackgroundColor(high)
+                        Priority.MEDIUM -> priorityIndicator.setCardBackgroundColor(medium)
+                        Priority.LOW -> priorityIndicator.setCardBackgroundColor(low)
                     }
                 }
+                is NiceSpinner -> {
+                    setList(priorityIndicator,false)
+                    priorityIndicator.setTextAppearance(R.style.textAppearance)
+                    when (priority) {
+                        Priority.HIGH -> {
+                            priorityIndicator.selectedIndex = 0
+                            priorityIndicator.setTextColor(high)}
+                        Priority.MEDIUM -> {
+                            priorityIndicator.selectedIndex = 1
+                            priorityIndicator.setTextColor(medium) }
+                        Priority.LOW -> {
+                            priorityIndicator.selectedIndex = 2
+                            priorityIndicator.setTextColor(low) }
+                    }
 
+                }
+                is TextInputLayout -> {
+                    when(priority){
+                        Priority.HIGH->{priorityIndicator.boxStrokeColor=high}
+                        Priority.MEDIUM -> {priorityIndicator.boxStrokeColor=(medium)}
+                        Priority.LOW -> {priorityIndicator.boxStrokeColor=(low)}
+                    }
+                }
             }
 
         }
@@ -185,7 +166,7 @@ class DataBindingAdapters {
                         isFirstResource: Boolean
                     ): Boolean {
                         view.visibility = View.GONE
-                        return false
+                        return true
                     }
 
                     override fun onResourceReady(
@@ -195,11 +176,11 @@ class DataBindingAdapters {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-
                         return false
                     }
                 }).into(imageView)
                 view.visibility = View.VISIBLE
+
             }
         }
 
@@ -226,7 +207,6 @@ class DataBindingAdapters {
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        Log.i("Glide", e.toString() + " j")
                         view.visibility = View.GONE
                         return false
                     }
@@ -238,7 +218,6 @@ class DataBindingAdapters {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-
                         return false
                     }
                 }).into(view)
@@ -315,6 +294,16 @@ class DataBindingAdapters {
 
             }
         }
+
+
+
+
+
+
+        
+
+            
+
 
     }
 

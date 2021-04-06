@@ -13,21 +13,22 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.todo.R
+import com.example.todo.databinding.MediaPlayerBinding
 import java.io.File
 import java.io.FileInputStream
 
 class MediaPlayerLifeCycle(
-    val view: RelativeLayout,
+    val view: MediaPlayerBinding,
     val context: Context,
     var audioFilePath: String
 ) : SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener {
 
-    private val seekBar: SeekBar = view.findViewById(R.id.seek_bar)
-    private val tvDue: TextView = view.findViewById(R.id.tv_due)
-    private val tvPass: TextView = view.findViewById(R.id.tv_pass)
+    private val seekBar: SeekBar = view.seekBar
+    private val tvDue: TextView = view.tvDue
+    private val tvPass: TextView = view.tvPass
     private var runnable: Runnable? = null
     private var handler: Handler = Handler(Looper.getMainLooper())
-    private val playButton: ImageButton = view.findViewById(R.id.playButton)
+    private val playButton: ImageButton = view.playButton
     private var mediaPlayer: MediaPlayer?
     private var pause = false
     private var isStarted = false
@@ -132,7 +133,7 @@ class MediaPlayerLifeCycle(
     fun initializeMediaPlayer(file: String) {
         audioFilePath = file
         isStarted = false
-        view.visibility = View.VISIBLE
+        view.root.visibility = View.VISIBLE
         if (mediaPlayer == null) {
             mediaPlayer = MediaPlayer().apply {
                 setAudioAttributes(
@@ -176,7 +177,7 @@ class MediaPlayerLifeCycle(
     fun removeMediaPlayer() {
         handler.removeCallbacks(runnable!!)
         mediaPlayer = null
-        view.visibility = View.GONE
+        view.root.visibility = View.GONE
         audioFilePath = ""
     }
 }

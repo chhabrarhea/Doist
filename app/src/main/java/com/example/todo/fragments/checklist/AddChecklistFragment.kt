@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todo.R
 import com.example.todo.data.TodoViewModel
@@ -36,7 +37,7 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
         setHasOptionsMenu(true)
         (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
 
-        binding.prioritiesSpinner.onSpinnerItemSelectedListener=viewModel.initializeSpinnerForCheckList(requireContext())
+        binding.prioritiesSpinner.onSpinnerItemSelectedListener=viewModel.initializeSpinnerForCheckList(requireContext(),binding.nameLayout)
 
         binding.reminderLayout.setOnClickListener {deleteReminder()}
         return binding.root
@@ -69,9 +70,8 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
                     binding.nameLayout.error = "Cannot be Empty"
                 } else {
                     binding.nameLayout.isErrorEnabled = false
-                    binding.task.setText("")
                     val task = CheckListTask(binding.task.text.toString(), false)
-                    binding.task.clearComposingText()
+                    binding.task.setText("")
                     adapter.addItem (task)
                 }
                 return true
@@ -111,6 +111,8 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
                 "",
                 adapter.listTask,"",viewModel.dateString)
                 todoViewModel.insertData(todo,requireContext(),viewModel.date)
+            Toast.makeText(requireContext(),"Successfully added ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_addChecklistFragment_to_listFragment)
             }
     }
 

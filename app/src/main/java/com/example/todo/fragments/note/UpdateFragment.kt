@@ -8,6 +8,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -22,8 +23,6 @@ import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentUpdateBinding
 import com.example.todo.fragments.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
-import com.example.todo.utils.GlideApp
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.reflect.Method
 
 class UpdateFragment : Fragment() {
@@ -42,7 +41,7 @@ class UpdateFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.i("update","created")
+
         view = FragmentUpdateBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
         args = requireArguments().getParcelable("currentItem")!!
@@ -60,12 +59,9 @@ class UpdateFragment : Fragment() {
         if(SharedViewModel.canvasImage.value=="" && args.canvasPath!="")
             sharedViewModel.setCanvasImage(args.canvasPath)
         SharedViewModel.canvasImage.observe(viewLifecycleOwner,{
-            Log.i("s",it)
             if(it!=""){
-
                 canvasPath=it
-                Log.i("s",canvasPath)
-                setImage(it,view.canvas,view.deleteCanvas)
+                setImage(view.canvasRoot,it,view.canvas)
             } })
 
         sharedViewModel.mCurrentPhotoPath = args.image
@@ -78,16 +74,9 @@ class UpdateFragment : Fragment() {
         view.deleteCanvas.setOnClickListener { removeCanvasImage() }
         view.currentPrioritiesSpinner.onSpinnerItemSelectedListener =
             sharedViewModel.initializeSpinner(requireContext(), view.priorityIndicator)
-        view.deleteAudio.setOnClickListener { removeMediaPlayer() }
-        view.reminderLayout.setOnClickListener {
-            val alertDialog=AlertDialog.Builder(requireContext())
-            alertDialog.setTitle("Cancel Reminder ?")
-            alertDialog.setPositiveButton("Yes"){_,_->run{
-                view.reminderLayout.visibility=View.GONE
-                todoViewModel.deleteReminder(args.id)
-            }}
-            alertDialog.setNegativeButton("No",null)
-        alertDialog.create().show()}
+        view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
+        view.reminderLayout.setOnClickListener {sharedViewModel.deleteReminderDialog(requireContext(),view.reminderLayout)}
+
         return view.root
     }
 
@@ -116,10 +105,9 @@ class UpdateFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, fromGallery)
     }
-    private fun setImage(it: String?,image:ImageView,float: FloatingActionButton) {
+    private fun setImage(root:RelativeLayout,it: String,image:ImageView) {
         Glide.with(requireContext()).load(it).into(image)
-        image.visibility=View.VISIBLE
-        float.visibility=View.VISIBLE
+        root.visibility=View.VISIBLE
     }
     private fun addVn() {
         val alert = AlertDialog.Builder(requireContext())
@@ -164,31 +152,20 @@ class UpdateFragment : Fragment() {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == sharedViewModel.fromCamera) {
                 uri = Uri.parse(sharedViewModel.mCurrentPhotoPath)
-                view.image.visibility = View.VISIBLE
-                view.deleteImage.visibility = View.VISIBLE
-                GlideApp.with(requireContext()).load(uri.toString()).into(view.image)
+                setImage(view.imageRoot,uri.toString(),view.image)
             } else if (requestCode == fromGallery && data != null) {
-                uri = data.data!!
-                Glide.with(requireContext()).load(uri.toString()).into(view.image)
-                view.deleteImage.visibility = View.VISIBLE
-                view.image.visibility = View.VISIBLE
+                uri=data.data!!
                 val path = sharedViewModel.getRealPathFromURI(uri, requireActivity())
                 if (path != null) {
                     sharedViewModel.mCurrentPhotoPath = path
+                    setImage(view.imageRoot,path,view.image)
                 }
             } else if (requestCode == 77 && data != null) {
                 val uri: Uri = data.data!!
                 val path: String? = sharedViewModel.getRealPathFromURI(uri, requireActivity())
                 if (path != null) {
                     sharedViewModel.setRecordAudio(path)
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Some error occured, try again!",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
-
             }
         }
     }
@@ -289,8 +266,7 @@ class UpdateFragment : Fragment() {
     }
 
     private fun removeImage() {
-        view.deleteImage.visibility = View.GONE
-        view.image.visibility = View.GONE
+        view.imageRoot.visibility=View.GONE
         sharedViewModel.mCurrentPhotoPath = ""
     }
     private fun removeUrl() {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryColor">#344955</color>
+    <color name="secondaryColor">#ffd558</color>
+    <color name="primaryBackground">#212124</color>
+<color name="titleTextColor">#fff</color>
+
+    <color name="primaryTextColor">#fff</color>
+
+    <color name="secondaryTextColor">#fff</color>
+    <color name="high">#3f4485</color>
+    <color name="medium">#62c1f3</color>
+    <color name="low">#b1ffed</color>
+</resources>

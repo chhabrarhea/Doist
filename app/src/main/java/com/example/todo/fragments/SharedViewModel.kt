@@ -18,7 +18,6 @@ import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.AdapterView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -33,6 +32,7 @@ import com.example.todo.R
 import com.example.todo.data.models.Priority
 import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.UrlDialogBinding
+import com.google.android.material.textfield.TextInputLayout
 import org.angmarch.views.OnSpinnerItemSelectedListener
 import java.io.File
 import java.io.IOException
@@ -170,18 +170,21 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
     }
-    fun initializeSpinnerForCheckList(context: Context):OnSpinnerItemSelectedListener{
-        return OnSpinnerItemSelectedListener { parent, v, position, id ->
+    fun initializeSpinnerForCheckList(context: Context,layout:TextInputLayout):OnSpinnerItemSelectedListener{
+        return OnSpinnerItemSelectedListener { parent, _, position, _ ->
             parent.setTextAppearance(R.style.textAppearance)
             when(position){
                 0->{
                     parent.setTextColor(ContextCompat.getColor(context,R.color.high))
+                    layout.boxStrokeColor=ContextCompat.getColor(context,R.color.high)
                 }
                 1->{
                     parent.setTextColor(ContextCompat.getColor(context,R.color.medium))
+                    layout.boxStrokeColor=ContextCompat.getColor(context,R.color.medium)
                 }
                 2->{
                     parent.setTextColor(ContextCompat.getColor(context,R.color.low))
+                    layout.boxStrokeColor=ContextCompat.getColor(context,R.color.low)
                 }
             }
         }
@@ -194,13 +197,12 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(activity.packageManager) != null) {
             // Create the File where the photo should go
-            var photoFile: File? = null
+            val photoFile: File?
             try {
                 photoFile = createImageFile()
             } catch (ex: IOException) {
                 return null
             }
-            // Continue only if the File was successfully created
             if (photoFile != null) {
                 val photoURI: Uri = FileProvider.getUriForFile(
                     context,
@@ -293,9 +295,20 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         date=null
         dateString=null
     }
-    fun removeReminderDialog(context: Context,view:RelativeLayout){
 
+    fun deleteReminderDialog(context: Context,view:RelativeLayout):AlertDialog.Builder{
+        val alertDialog=AlertDialog.Builder(context)
+        alertDialog.setTitle("Cancel Reminder?")
+        alertDialog.setPositiveButton("Yes"){_,_->run{
+            view.visibility=View.GONE
+            date=null
+            dateString=null
+        }}
+        alertDialog.setNegativeButton("No",null)
+        alertDialog.create()
+        return alertDialog
     }
+    }
+
     
 
-}

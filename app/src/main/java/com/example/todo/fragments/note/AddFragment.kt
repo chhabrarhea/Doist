@@ -70,19 +70,12 @@ class AddFragment : Fragment(){
 
         view.deleteImage.setOnClickListener { removeImage() }
         view.deleteUrl.setOnClickListener { removeUrl() }
-        view.deleteAudio.setOnClickListener { removeMediaPlayer() }
+        view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
         view.deleteCanvas.setOnClickListener { removeCanvasImage() }
-        view.reminderLayout.setOnClickListener {
-            val alertDialog=AlertDialog.Builder(requireContext())
-            alertDialog.setTitle("Cancel Reminder?")
-            alertDialog.setPositiveButton("Yes"){_,_->run{
-                view.reminderLayout.visibility=View.GONE
-                sharedViewModel.date=null
-                sharedViewModel.dateString=null
-            }}
-            alertDialog.setNegativeButton("No",null)
-            alertDialog.create().show()}
-        return view.root }
+        view.reminderLayout.setOnClickListener {sharedViewModel.deleteReminderDialog(requireContext(),view.reminderLayout).show()}
+
+        return view.root
+    }
 
     //sets Image in imageView using Glide
     private fun setImage(it: String?, image: ImageView, button: FloatingActionButton) {

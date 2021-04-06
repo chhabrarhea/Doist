@@ -11,12 +11,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/listLayout"
+    android:fitsSystemWindows="true"
     tools:context=".fragments.list.ListFragment">
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingTop="8dp"
+        android:paddingHorizontal="8dp"
         android:paddingBottom="?attr/actionBarSize"
         android:id="@+id/recyclerView"/>
 
@@ -24,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:backgroundTint="@color/primaryDarkColor"
+        android:backgroundTint="@color/primaryColor"
         android:id="@+id/toolbar"
         app:fabAlignmentMode="end"/>
 
@@ -46,7 +48,6 @@
         android:layout_marginEnd="42dp"
         android:layout_below="@id/addNote"
         android:id="@+id/addList"
-        app:backgroundTint="@color/secondaryColor"
         android:visibility="invisible"
        android:navigateToCheckListFragment="@{true}"
         android:src="@drawable/ic_baseline_format_list_bulleted_24"/>
@@ -57,7 +58,6 @@
             android:layout_marginBottom="138dp"
             android:layout_marginEnd="42dp"
             android:layout_gravity="bottom|end"
-            app:backgroundTint="@color/secondaryColor"
             android:visibility="invisible"
             android:navigateToAddFragment="@{true}"
             app:fabSize="mini"

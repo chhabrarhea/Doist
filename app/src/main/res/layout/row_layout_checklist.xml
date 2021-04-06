@@ -11,9 +11,11 @@
             type="com.example.todo.data.models.ToDoData" />
     </data>
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@color/primaryBackground"
         android:layout_margin="4dp">
 
         <RelativeLayout
@@ -23,8 +25,7 @@
             android:padding="15dp"
             android:navigateToUpdateCheckListFragment="@{todo}"
             android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:background="@drawable/item_background">
+            android:layout_marginEnd="5dp">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/priority_indicator"
@@ -41,7 +42,7 @@
                 android:layout_height="wrap_content"
 
                 android:text="@{todo.title}"
-                android:textColor="@color/darkGray"
+                android:textColor="@color/primaryTextColor"
                 android:textSize="20sp"
                 android:layout_toStartOf="@id/priority_indicator"
                 android:textStyle="bold"
@@ -57,5 +58,5 @@
 
 
         </RelativeLayout>
-    </RelativeLayout>
+    </androidx.cardview.widget.CardView>
 </layout>

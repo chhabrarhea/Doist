@@ -6,6 +6,7 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".fragments.checklist.AddChecklistFragment">
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
@@ -13,7 +14,7 @@
         android:id="@+id/toolbar"
         app:title="Add a ToDo"
         app:titleTextColor="?attr/colorControlNormal"
-        android:background="@color/primaryDarkColor"
+        android:background="@color/primaryColor"
         android:fitsSystemWindows="true"/>
     <ScrollView
         android:layout_width="match_parent"
@@ -39,7 +40,7 @@
             android:paddingVertical="10dp"
             android:hint="@string/title"
             android:inputType="textPersonName"
-            android:textColor="@color/design_default_color_on_secondary"
+            android:textColor="@color/titleTextColor"
             android:textStyle="bold"
             android:importantForAutofill="no" />
         <LinearLayout
@@ -95,7 +96,9 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:textSize="16sp"
-            android:textColor="@color/darkGray"
+            app:backgroundSelector="@drawable/background_selector"
+            android:backgroundTint="@color/primaryBackground"
+            android:textColor="@color/primaryTextColor"
             android:textStyle="bold"
             android:setList="@{true}"
             android:id="@+id/priorities_spinner"
@@ -106,14 +109,14 @@
             android:layout_height="wrap_content"
             android:hint="@string/task"
             android:layout_below="@id/priorities_spinner"
-            app:boxStrokeColor="@color/primaryDarkColor"
+            app:boxStrokeColor="@color/high"
             app:hintEnabled="true"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_add"
-            android:drawableTint="@color/primaryDarkColor"
+            android:drawableTint="@color/primaryColor"
             android:id="@+id/task" />
         </com.google.android.material.textfield.TextInputLayout>
         <androidx.recyclerview.widget.RecyclerView

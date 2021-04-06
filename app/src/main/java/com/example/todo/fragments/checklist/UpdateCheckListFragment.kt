@@ -39,7 +39,7 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
         binding.task.setOnTouchListener(this)
         setHasOptionsMenu(true)
         (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
-        binding.prioritiesSpinner.onSpinnerItemSelectedListener = viewModel.initializeSpinnerForCheckList(requireContext())
+        binding.prioritiesSpinner.onSpinnerItemSelectedListener = viewModel.initializeSpinnerForCheckList(requireContext(),binding.nameLayout)
         binding.reminderLayout.setOnClickListener {
             val alertDialog=AlertDialog.Builder(requireContext())
             alertDialog.setTitle("Cancel Reminder?")
@@ -68,8 +68,8 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
                     binding.nameLayout.error = "Cannot be Empty"
                 } else {
                     binding.nameLayout.isErrorEnabled = false
-                    binding.task.setText("")
                     val task = CheckListTask(binding.task.text.toString(), false)
+                    binding.task.setText("")
                     adapter.addItem(task)
                 }
                 return true

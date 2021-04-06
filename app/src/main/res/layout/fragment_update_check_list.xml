@@ -15,9 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/toolbar"
-            app:title="ToDo"
+            app:title="Doist"
             app:titleTextColor="?attr/colorControlNormal"
-            android:background="@color/primaryDarkColor"
+            android:background="@color/primaryColor"
             android:fitsSystemWindows="true"/>
         <ScrollView
             android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                         android:hint="@string/title"
                         android:text="@{args.title}"
                         android:inputType="textPersonName"
-                        android:textColor="@color/design_default_color_on_secondary"
+                        android:textColor="@color/titleTextColor"
                         android:textStyle="bold"
                         android:importantForAutofill="no" />
                     <LinearLayout
@@ -100,9 +100,11 @@
                     <org.angmarch.views.NiceSpinner
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:backgroundSelector="@drawable/background_selector"
                         android:textStyle="bold"
-                        android:setList="@{false}"
+                        android:background="@color/primaryBackground"
                         android:getPriorityColor="@{args.priority}"
+
                         android:textSize="16sp"
                         android:padding="15dp"
                         android:id="@+id/priorities_spinner"
@@ -114,7 +116,7 @@
                         android:hint="@string/task"
                         android:layout_marginTop="3dp"
                         android:layout_below="@id/priorities_spinner"
-                        app:boxStrokeColor="@color/primaryDarkColor"
+                        android:getPriorityColor="@{args.priority}"
                         app:hintEnabled="true"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
                         <com.google.android.material.textfield.TextInputEditText

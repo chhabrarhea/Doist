@@ -18,7 +18,7 @@
             android:id="@+id/toolbar"
             app:title="Update ToDo"
             app:titleTextColor="?attr/colorControlNormal"
-            android:background="@color/primaryDarkColor"
+            android:background="@color/primaryColor"
             android:fitsSystemWindows="true"/>
     <ScrollView
         android:layout_width="match_parent"
@@ -33,7 +33,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:getPriorityId="@{args.priority}"
                 android:padding="24dp">
             <EditText
                 android:id="@+id/current_title_et"
@@ -47,7 +46,7 @@
                 android:hint="@string/title"
                 android:text="@{args.title}"
                 android:inputType="textPersonName"
-                android:textColor="@color/design_default_color_on_secondary"
+                android:textColor="@color/titleTextColor"
                 android:textStyle="bold"/>
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -101,7 +100,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
+                android:getPriorityColor="@{args.priority}"
+                app:backgroundSelector="@drawable/background_selector"
                 android:textSize="16sp"
+                android:background="@color/primaryBackground"
+                android:textColor="@color/primaryTextColor"
                 android:padding="15dp"
                 android:id="@+id/current_priorities_spinner"
                 android:layout_below="@id/timeLayout" />
@@ -141,8 +144,9 @@
                     android:layout_centerInParent="true"
                     android:layout_marginTop="8dp"
                     android:visibility="gone"
+                    android:LoadImageWithGlide="@{args.canvasPath}"
                     tools:visibility="visible"
-                    android:LoadImageWithGlide="@{args.canvasPath}">
+                    >
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -192,58 +196,13 @@
                     android:id="@+id/deleteUrl"
                     android:contentDescription="@string/delete_url" />
             </RelativeLayout>
-                <RelativeLayout
+                <include layout="@layout/media_player"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/mediaPlayer"
+                    android:layout_marginTop="8dp"
                     android:visibility="gone"
-                    android:background="@drawable/media_player_background"
-                    android:padding="13dp"
-                    android:layout_marginBottom="5dp"
-                    tools:visibility="visible"
-                    android:layout_marginTop="10dp"
-                    android:layout_below="@id/urlRoot">
-                    <TextView
-                        android:id="@+id/tv_pass"
-                        android:text="0 secs"
-                        android:layout_width="wrap_content"
-                        android:layout_toRightOf="@id/playButton"
-                        android:layout_marginHorizontal="14dp"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:id="@+id/tv_due"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toLeftOf="@id/deleteAudio"
-                        android:layout_marginHorizontal="8dp" />
-                    <SeekBar
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@id/playButton"
-                        android:layout_below="@id/tv_pass"
-                        android:layout_toLeftOf="@id/deleteAudio"
-                        android:layout_marginHorizontal="5dp"
-                        android:id="@+id/seek_bar"/>
-
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:scaleType="fitCenter"
-                        android:layout_centerVertical="true"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/avd_play_to_pause"
-                        android:id="@+id/playButton" />
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/ic_baseline_delete_24"
-                        android:background="@android:color/transparent"
-                        android:tint="@color/darkGray"
-                        android:layout_alignParentEnd="true"
-                        android:id="@+id/deleteAudio"/>
-                </RelativeLayout>
+                    android:layout_below="@id/urlRoot"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -254,6 +213,7 @@
                     <androidx.cardview.widget.CardView
                         android:id="@+id/priority_indicator"
                         android:layout_width="6dp"
+                        android:getPriorityColor="@{args.priority}"
                         android:layout_height="match_parent"
                         app:cardCornerRadius="20dp"
                         />

@@ -25,7 +25,8 @@
             android:layout_width="match_parent"
             android:background="#e2e2e2"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY"
+            android:contentDescription="@string/app_name" />
 
    <com.example.todo.fragments.draw.DrawingView
        android:id="@+id/canvas"
