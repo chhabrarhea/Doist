@@ -1,6 +1,7 @@
 package com.example.todo.utils
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
@@ -15,9 +16,15 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.DrawableImageViewTarget
 import com.bumptech.glide.request.target.Target
 import com.example.todo.R
 import com.example.todo.data.models.Priority
@@ -68,7 +75,19 @@ class DataBindingAdapters {
         @JvmStatic
         fun emptyDatabase(view: View, emptyDatabase: MutableLiveData<Boolean>) {
             when (emptyDatabase.value) {
-                true -> view.visibility = View.VISIBLE
+                true -> {view.visibility = View.VISIBLE
+                    val image=view.findViewById<ImageView>(R.id.gif)
+                    val animated = AnimatedVectorDrawableCompat.create(image.context, R.drawable.avd_noteit)
+                    animated?.registerAnimationCallback(object : Animatable2Compat.AnimationCallback() {
+                        override fun onAnimationEnd(drawable: Drawable?) {
+                            image.post { animated.start() }
+                        }
+
+                    })
+                    image.setImageDrawable(animated)
+                    animated?.start()
+
+                }
                 false -> view.visibility = View.INVISIBLE
             }
         }
@@ -198,9 +217,8 @@ class DataBindingAdapters {
         @BindingAdapter("android:LoadImage")
         @JvmStatic
         fun loadImage(view: ImageView, path: String) {
-            Log.i("glide", path)
             if (path != "") {
-                GlideApp.with(view.context).load(path).listener(object : RequestListener<Drawable> {
+               GlideApp.with(view.context).load(path).listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,

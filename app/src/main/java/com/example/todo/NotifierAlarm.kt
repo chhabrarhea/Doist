@@ -53,7 +53,7 @@ class NotifierAlarm :BroadcastReceiver() {
         }
        val notification = builder.setContentTitle(todo?.title)
             .setContentText(desc).setAutoCancel(true)
-            .setSound(alarm).setSmallIcon(R.mipmap.ic_launcher_round)
+            .setSound(alarm).setSmallIcon(R.drawable.ic_note)
             .setContentIntent(intent2)
             .setChannelId("my_channel_01")
             .build()

@@ -11,6 +11,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/listLayout"
+    android:background=""
     android:fitsSystemWindows="true"
     tools:context=".fragments.list.ListFragment">
     <androidx.recyclerview.widget.RecyclerView
@@ -21,6 +22,30 @@
         android:paddingHorizontal="8dp"
         android:paddingBottom="?attr/actionBarSize"
         android:id="@+id/recyclerView"/>
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:visibility="gone"
+       android:emptyDatabase="@{sharedVM.listIsEmpty}">
+<ImageView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/avd_noteit"
+    android:contentDescription="@string/noteimage"
+    android:id="@+id/gif"
+
+    app:tint="@color/darkGray" />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_below="@id/gif"
+           android:layout_centerHorizontal="true"
+           android:textColor="@color/darkGray"
+           android:textSize="22sp"
+           android:layout_marginTop="-70dp"
+           android:textStyle="bold"
+           android:text="@string/such_empty"/>
+   </RelativeLayout>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:layout_width="match_parent"
@@ -37,7 +62,8 @@
         android:id="@+id/menuButton"
         app:fabSize="normal"
         app:pressedTranslationZ="12dp"
-        android:src="@drawable/ic_add"/>
+        android:src="@drawable/ic_add"
+        android:contentDescription="@string/noteimage" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
@@ -50,7 +76,8 @@
         android:id="@+id/addList"
         android:visibility="invisible"
        android:navigateToCheckListFragment="@{true}"
-        android:src="@drawable/ic_baseline_format_list_bulleted_24"/>
+        android:src="@drawable/ic_baseline_format_list_bulleted_24"
+        android:contentDescription="@string/noteimage" />
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addNote"
             android:layout_width="wrap_content"
@@ -62,7 +89,7 @@
             android:navigateToAddFragment="@{true}"
             app:fabSize="mini"
             android:src="@drawable/ic_baseline_note_add_24"
-            />
+            android:contentDescription="@string/noteimage" />
 
 
 

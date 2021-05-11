@@ -11,6 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/primaryBackground"
         tools:context=".fragments.note.UpdateFragment">
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
@@ -103,6 +104,7 @@
                 android:getPriorityColor="@{args.priority}"
                 app:backgroundSelector="@drawable/background_selector"
                 android:textSize="16sp"
+                app:arrowTint="@color/secondaryTextColor"
                 android:background="@color/primaryBackground"
                 android:textColor="@color/primaryTextColor"
                 android:padding="15dp"
