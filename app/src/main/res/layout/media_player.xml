@@ -9,9 +9,9 @@
         android:layout_below="@id/urlRoot">
         <TextView
             android:id="@+id/tv_pass"
-            android:text="0 secs"
+            android:text="00:00"
             android:layout_width="wrap_content"
-            android:layout_toRightOf="@id/playButton"
+            android:layout_toEndOf="@id/playButton"
             android:layout_marginHorizontal="14dp"
             android:layout_height="wrap_content" />
 

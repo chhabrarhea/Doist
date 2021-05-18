@@ -1,4 +1,4 @@
-package com.example.todo.fragments
+package com.example.todo.utils
 
 import android.content.Context
 import android.graphics.drawable.Animatable
@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
-import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -16,6 +15,7 @@ import com.example.todo.R
 import com.example.todo.databinding.MediaPlayerBinding
 import java.io.File
 import java.io.FileInputStream
+import java.util.concurrent.TimeUnit
 
 class MediaPlayerLifeCycle(
     val view: MediaPlayerBinding,
@@ -45,11 +45,11 @@ class MediaPlayerLifeCycle(
     private fun initializeSeekBar() {
         if (mediaPlayer == null)
             return
-        seekBar.max = mediaPlayer!!.duration / 1000
-        tvDue.text = "${seekBar.max} secs"
+        seekBar.max = mediaPlayer!!.duration/1000
+        tvDue.text = getFormattedDuration(mediaPlayer!!.duration.toLong())
         runnable = Runnable {
             seekBar.progress = mediaPlayer!!.currentPosition / 1000
-            tvPass.text = "${mediaPlayer!!.currentPosition / 1000} secs"
+            tvPass.text = getFormattedDuration(mediaPlayer!!.currentPosition.toLong())
             handler.postDelayed(runnable!!, 1000)
         }
         handler.postDelayed(runnable!!, 1000)
@@ -179,5 +179,23 @@ class MediaPlayerLifeCycle(
         mediaPlayer = null
         view.root.visibility = View.GONE
         audioFilePath = ""
+    }
+
+    private fun getFormattedDuration(ms:Long):String{
+        var milliseconds = ms
+        val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
+        milliseconds -= TimeUnit.HOURS.toMillis(hours)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
+        milliseconds -= TimeUnit.MINUTES.toMillis(minutes)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
+
+        return if(hours>0){
+            "${if(hours < 10) "0" else ""}$hours:" +
+                    "${if(minutes < 10) "0" else ""}$minutes:" +
+                    "${if(seconds < 10) "0" else ""}$seconds"
+        } else
+            "${if(minutes < 10) "0" else ""}$minutes:" +
+                    "${if(seconds < 10) "0" else ""}$seconds"
+
     }
 }

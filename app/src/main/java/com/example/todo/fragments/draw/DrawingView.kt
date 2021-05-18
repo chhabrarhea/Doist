@@ -41,6 +41,7 @@ class DrawingView(context: Context, attr: AttributeSet): View(context, attr) {
      fun clearBrushes() {
         paths.clear()
         undoPaths.clear()
+         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {

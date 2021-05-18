@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.RelativeLayout
@@ -21,7 +20,7 @@ import com.example.todo.R
 import com.example.todo.data.TodoViewModel
 import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentUpdateBinding
-import com.example.todo.fragments.MediaPlayerLifeCycle
+import com.example.todo.utils.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
 import java.lang.reflect.Method
 
@@ -72,8 +71,7 @@ class UpdateFragment : Fragment() {
         view.deleteImage.setOnClickListener { removeImage() }
         view.deleteUrl.setOnClickListener { removeUrl() }
         view.deleteCanvas.setOnClickListener { removeCanvasImage() }
-        view.currentPrioritiesSpinner.onSpinnerItemSelectedListener =
-            sharedViewModel.initializeSpinner(requireContext(), view.priorityIndicator)
+        view.currentPrioritiesSpinner.onSpinnerItemSelectedListener = sharedViewModel.initializeSpinner(requireContext(), view.priorityIndicator)
         view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
         view.reminderLayout.setOnClickListener {sharedViewModel.deleteReminderDialog(requireContext(),view.reminderLayout)}
 
@@ -120,13 +118,8 @@ class UpdateFragment : Fragment() {
                             sharedViewModel.micRequestCode
                         )
                     } else {
-                        val bundle = Bundle()
-                        bundle.putString("audioFilePath", args.date)
-                        bundle.putString("title", args.title)
-                        findNavController().navigate(
-                            R.id.action_updateFragment_to_recordAudioFragment2,
-                            bundle
-                        )
+                       sharedViewModel.inflateRecordDialog(requireContext()).show()
+
                     }
                 }
             }
@@ -195,13 +188,7 @@ class UpdateFragment : Fragment() {
                 )
                 m.isAccessible = true
                 m.invoke(menu, true)
-            } catch (e: Exception) {
-                Log.e(
-                    javaClass.simpleName,
-                    "onMenuOpened...unable to set icons for overflow menu",
-                    e
-                )
-            }
+            } catch (e: Exception) {}
         }
         super.onPrepareOptionsMenu(menu)
     }

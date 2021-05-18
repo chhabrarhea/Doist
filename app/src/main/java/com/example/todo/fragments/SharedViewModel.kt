@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
+import android.os.SystemClock
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
@@ -31,7 +32,9 @@ import com.example.todo.BuildConfig
 import com.example.todo.R
 import com.example.todo.data.models.Priority
 import com.example.todo.data.models.ToDoData
+import com.example.todo.databinding.RecordDialogBinding
 import com.example.todo.databinding.UrlDialogBinding
+import com.github.squti.androidwaverecorder.WaveRecorder
 import com.google.android.material.textfield.TextInputLayout
 import org.angmarch.views.OnSpinnerItemSelectedListener
 import java.io.File
@@ -152,7 +155,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         } }
     fun initializeSpinner(context: Context,priorityIndicator: CardView):OnSpinnerItemSelectedListener{
 
-        return OnSpinnerItemSelectedListener { parent, v, position, id ->
+        return OnSpinnerItemSelectedListener { parent, _, position, _ ->
             parent.setTextAppearance(R.style.textAppearance)
             when(position){
                 0->{
@@ -217,7 +220,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     }
     @Throws(IOException::class)
     fun createImageFile(): File? {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss",Locale.getDefault()).format(Date())
         val imageFileName = "JPEG_" + timeStamp + "_"
         val storageDir: File = File(
             Environment.getExternalStoragePublicDirectory(
@@ -307,6 +310,46 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         alertDialog.setNegativeButton("No",null)
         alertDialog.create()
         return alertDialog
+    }
+
+    fun inflateRecordDialog(context: Context):AlertDialog{
+        val file = File(context.getExternalFilesDir(null)?.absolutePath, "Doist")
+        if (!file.exists()) file.mkdir()
+        val audioFilePath =file.path + "/audio" + Calendar.getInstance().time + ".wav"
+        var isRecording=false
+        var recorder:WaveRecorder?=null
+        val alertDialog=AlertDialog.Builder(context)
+        val binding=RecordDialogBinding.inflate(LayoutInflater.from(context))
+        alertDialog.setView(binding.root)
+        val alb=alertDialog.create()
+        binding.recordButton.setOnClickListener {
+             if(!isRecording){
+                 binding.stopButton.isEnabled = true
+                 binding.recordButton.isEnabled = false
+                 isRecording=true
+                 try {
+                     binding.timer.base = SystemClock.elapsedRealtime()
+                     recorder = WaveRecorder(audioFilePath)
+                     recorder!!.startRecording()
+                     binding.timer.start()
+                 } catch (e: Exception) {
+                     e.printStackTrace()
+                 }
+             }
+        }
+        binding.stopButton.setOnClickListener {
+            if (isRecording) {
+                binding.timer.stop()
+                recorder!!.stopRecording()
+                binding.recordButton.isEnabled = true
+                isRecording = false
+                binding.stopButton.isEnabled = false }
+        }
+        binding.save.setOnClickListener {
+            this.setRecordAudio(audioFilePath)
+            alb.dismiss()
+        }
+        return alb
     }
     }
 

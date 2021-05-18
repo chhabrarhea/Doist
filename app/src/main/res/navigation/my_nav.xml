@@ -52,15 +52,6 @@
             app:popUpTo="@id/listFragment"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_addFragment_to_recordAudioFragment"
-            app:destination="@id/recordAudioFragment"
-            app:enterAnim="@anim/from_right"
-            app:exitAnim="@anim/to_left"
-            app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/to_right"
-            app:popUpTo="@id/addFragment"
-            app:popUpToInclusive="false" />
-        <action
             android:id="@+id/action_addFragment_to_drawFragment"
             app:destination="@id/drawFragment"
             app:enterAnim="@anim/from_left"
@@ -85,15 +76,6 @@
             android:name="currentItem"
             app:argType="com.example.todo.data.models.ToDoData" />
         <action
-            android:id="@+id/action_updateFragment_to_recordAudioFragment2"
-            app:destination="@id/recordAudioFragment"
-            app:enterAnim="@anim/from_right"
-            app:exitAnim="@anim/to_left"
-            app:popEnterAnim="@anim/from_left"
-            app:popExitAnim="@anim/to_right"
-            app:popUpTo="@id/updateFragment"
-            app:popUpToInclusive="false" />
-        <action
             android:id="@+id/action_updateFragment_to_drawFragment"
             app:destination="@id/drawFragment"
             app:enterAnim="@anim/from_left"
@@ -103,11 +85,6 @@
             app:popUpTo="@id/updateFragment"
             app:popUpToInclusive="false" />
     </fragment>
-    <fragment
-        android:id="@+id/recordAudioFragment"
-        android:name="com.example.todo.fragments.record.RecordAudioFragment"
-        android:label="fragment_record_audio"
-        tools:layout="@layout/fragment_record_audio" />
     <fragment
         android:id="@+id/addChecklistFragment"
         android:name="com.example.todo.fragments.checklist.AddChecklistFragment"

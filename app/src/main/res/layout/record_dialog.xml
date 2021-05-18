@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingVertical="10dp">
+
+    <Chronometer
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:padding="10dp"
+        android:textSize="48sp"
+        android:layout_margin="20dp"
+        android:id="@+id/timer"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/timer"
+        android:id="@+id/linear1"
+        android:gravity="center"
+        android:layout_margin="20dp">
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_baseline_mic_24"
+            android:tint="@color/secondaryTextColor"
+            android:backgroundTint="@android:color/transparent"
+            android:id="@+id/recordButton"
+            android:contentDescription="@string/start_recording" />
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:tint="@color/secondaryTextColor"
+            android:src="@drawable/ic_stop"
+            android:backgroundTint="@android:color/transparent"
+            android:id="@+id/stopButton"
+            android:contentDescription="@string/stop_recording" />
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:textColor="@color/white"
+        android:id="@+id/save"
+        app:backgroundTint="@color/secondaryColor"
+        android:layout_below="@id/linear1"
+        android:layout_centerHorizontal="true"/>
+
+
+</RelativeLayout>
+</layout>

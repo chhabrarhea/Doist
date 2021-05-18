@@ -5,13 +5,15 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#e2e2e2"
     tools:context=".fragments.draw.DrawFragment">
      <androidx.appcompat.widget.Toolbar
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:background="@color/primaryDarkColor"
          android:layout_gravity="top"
-         app:title=""
+         app:title="Draw"
+         app:titleTextColor="@color/white"
          android:layout_alignParentTop="true"
          android:fitsSystemWindows="true"
          android:id="@+id/toolbar"/>
@@ -62,7 +64,7 @@
          <TextView
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:text="Brush Style"
+             android:text="@string/brush_style"
              android:layout_centerInParent="true"
              android:textAlignment="center"
              android:textColor="#000"

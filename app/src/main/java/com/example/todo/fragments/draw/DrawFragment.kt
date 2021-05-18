@@ -67,6 +67,7 @@ private val sharedViewModel:SharedViewModel by viewModels()
                 }
             }
             alertDialog.setNegativeButton("No"){_,_->}
+            alertDialog.show()
         }
         return binding.root
     }

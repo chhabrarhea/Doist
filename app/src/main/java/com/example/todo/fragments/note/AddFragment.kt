@@ -20,7 +20,7 @@ import com.example.todo.R
 import com.example.todo.data.TodoViewModel
 import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentAddBinding
-import com.example.todo.fragments.MediaPlayerLifeCycle
+import com.example.todo.utils.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.reflect.Method
@@ -94,7 +94,8 @@ class AddFragment : Fragment(){
                         sharedViewModel.micRequestCode
                     )
                 }else{
-                findNavController().navigate(R.id.action_addFragment_to_recordAudioFragment)}
+                sharedViewModel.inflateRecordDialog(requireContext()).show()
+                }
             }}
             .setPositiveButton("Upload"){ _, _->run{
                 if (sharedViewModel.allPermissionsGrantedForAudioPicker(requireContext())){
@@ -115,18 +116,15 @@ class AddFragment : Fragment(){
         if(!sharedViewModel.allPermissionsGrantedForImage(requireContext())){
                requestPermissions(
                    sharedViewModel.requiredPermissionsForImage,
-                   sharedViewModel.requestCodeForImagePermissions
-               ) }
-        else{
-            dialogForImage()
+                   sharedViewModel.requestCodeForImagePermissions)
         }
-    }
-    private fun dialogForImage(){
-        val dialog=AlertDialog.Builder(requireContext())
-        dialog.setTitle("Add Image").setMessage("Capture from Camera or Upload from Gallery")
-        dialog.setNegativeButton("Gallery") { _, _ -> openGallery()}
-        dialog.setPositiveButton("Camera"){ _, _ -> openCamera()}
-        dialog.create().show()
+        else{
+            val dialog=AlertDialog.Builder(requireContext())
+            dialog.setTitle("Add Image").setMessage("Capture from Camera or Upload from Gallery")
+            dialog.setNegativeButton("Gallery") { _, _ -> openGallery()}
+            dialog.setPositiveButton("Camera"){ _, _ -> openCamera()}
+            dialog.create().show()
+        }
     }
     private fun openCamera() {
         val intent=sharedViewModel.openCamera(requireActivity(), requireContext())
@@ -232,7 +230,7 @@ class AddFragment : Fragment(){
         when(requestCode){
             sharedViewModel.requestCodeForImagePermissions -> {
                 if (sharedViewModel.allPermissionsGrantedForImage(requireContext())) {
-                    dialogForImage()
+                    addImage()
                 } else {
                     Toast.makeText(activity, "Permissions not granted!", Toast.LENGTH_SHORT).show()
                 }
@@ -250,7 +248,7 @@ class AddFragment : Fragment(){
             }
             sharedViewModel.micRequestCode -> {
                 if (sharedViewModel.allPermissionsGrantedForMic(requireContext())) {
-                    findNavController().navigate(R.id.action_addFragment_to_recordAudioFragment)
+                    sharedViewModel.inflateRecordDialog(requireContext()).show()
                 } else {
                     Toast.makeText(activity, "Permissions not granted!", Toast.LENGTH_SHORT).show()
                 }
