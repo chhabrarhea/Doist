@@ -324,8 +324,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         val alb=alertDialog.create()
         binding.recordButton.setOnClickListener {
              if(!isRecording){
-                 binding.stopButton.isEnabled = true
-                 binding.recordButton.isEnabled = false
+                 binding.recordButton.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_stop))
                  isRecording=true
                  try {
                      binding.timer.base = SystemClock.elapsedRealtime()
@@ -336,14 +335,13 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
                      e.printStackTrace()
                  }
              }
-        }
-        binding.stopButton.setOnClickListener {
-            if (isRecording) {
-                binding.timer.stop()
-                recorder!!.stopRecording()
-                binding.recordButton.isEnabled = true
-                isRecording = false
-                binding.stopButton.isEnabled = false }
+            else{
+                 binding.recordButton.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_baseline_mic_24))
+                 binding.timer.stop()
+                 recorder!!.stopRecording()
+                 binding.recordButton.isEnabled = true
+                 isRecording = false
+             }
         }
         binding.save.setOnClickListener {
             this.setRecordAudio(audioFilePath)
