@@ -53,12 +53,12 @@ class AddFragment : Fragment(){
             view.priorityIndicator
         )
 
-        mediaPlayerLifeCycle= MediaPlayerLifeCycle(view.mediaPlayer, requireContext(), "")
+        mediaPlayerLifeCycle= MediaPlayerLifeCycle(view.mediaPlayer, requireContext())
         if(mediaPlayerLifeCycle.audioFilePath!="" && SharedViewModel.audioRecorded.value=="")
             sharedViewModel.setRecordAudio("")
 
         SharedViewModel.audioRecorded.observe(viewLifecycleOwner, {
-            if (it != "") mediaPlayerLifeCycle.initializeMediaPlayer(it)
+            if (it != "") mediaPlayerLifeCycle.setDataSource(it)
         })
 
         SharedViewModel.canvasImage.observe(viewLifecycleOwner, {

@@ -1,9 +1,6 @@
 package com.example.todo
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.TaskStackBuilder
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -37,7 +34,7 @@ class NotifierAlarm :BroadcastReceiver() {
         taskStackBuilder.addNextIntent(intent1)
         val intent2 = taskStackBuilder.getPendingIntent(1, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val builder = NotificationCompat.Builder(p0)
+
         var channel:NotificationChannel?=null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channel = NotificationChannel(
@@ -46,10 +43,11 @@ class NotifierAlarm :BroadcastReceiver() {
                 NotificationManager.IMPORTANCE_HIGH
             )
         }
+        val builder = Notification.Builder(p0,channel!!.id)
         var desc=todo?.description
         if(desc.equals("") && todo?.checklist!=null){
             for (check in todo.checklist!!)
-                desc+=check.task+" "
+                desc+=check.task+"\n"
         }
        val notification = builder.setContentTitle(todo?.title)
             .setContentText(desc).setAutoCancel(true)
@@ -59,9 +57,9 @@ class NotifierAlarm :BroadcastReceiver() {
             .build()
 
         val  notificationManager =
-            p0?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            p0.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(channel!!)
+            notificationManager.createNotificationChannel(channel)
         }
         notificationManager.notify(todo!!.id, notification)
         dao=ToDoDatabase.getDatabase(p0.applicationContext).toDoDao()

@@ -106,20 +106,17 @@ private val sharedViewModel:SharedViewModel by viewModels()
         if(!checkForPermission())
             requestPermissions(arrayOf(permission), permissionCode)
         else{
-            CoroutineScope(IO).launch{
-                val a=async(IO) {
+            CoroutineScope(Dispatchers.Main).launch{
+                val job=async {
                     saveImage(getBitmapFromView(binding.canvas))
                 }
-                sharedViewModel.setCanvasFromBackground(a.await())
-
-                a.invokeOnCompletion {
+                sharedViewModel.setCanvasFromBackground(job.await())
                     isSaved=true
-
-                   if(i==1)
+                    if(i==1)
                        saveImageAndNavigate()
                     else
                         shareDrawing()
-                }}
+                }
 
         }
 
@@ -129,8 +126,8 @@ private val sharedViewModel:SharedViewModel by viewModels()
         if(!isSaved){
             saveBitmap(1) }
         else{
-
-        findNavController().popBackStack()}
+            findNavController().popBackStack()
+        }
     }
 
 

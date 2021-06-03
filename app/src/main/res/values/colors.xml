@@ -23,11 +23,11 @@
     <color name="medium">#1d91c0</color>
     <color name="low">#7fcdbb</color>
     <color name="orange">#FF5733</color>
-    <color name="red">#DF2F3C</color>
-    <color name="pink">#DF2FA4</color>
-    <color name="purple">#530688</color>
-    <color name="brown">#70411A</color>
-    <color name="green">#1F7230</color>
+    <color name="red">#b20a2c</color>
+    <color name="pink">#f80759</color>
+    <color name="purple">#4b134f</color>
+    <color name="brown">#ffb300</color>
+    <color name="green">#38ef7d</color>
     <color name="light_blue_50">#FFE1F5FE</color>
     <color name="light_blue_200">#FF81D4FA</color>
     <color name="light_blue_600">#FF039BE5</color>

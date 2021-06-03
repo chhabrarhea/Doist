@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.os.Bundle
+import android.os.Message
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -91,14 +92,15 @@ class TodoViewModel(application: Application):AndroidViewModel(application) {
             val todoBundle = Bundle()
             todoBundle.putParcelable("currentItem", toDo)
             intent.putExtra("currentItem", todoBundle)
-            val intent1 = PendingIntent.getBroadcast(
+            val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 toDo.id,
                 intent,
                 PendingIntent.FLAG_CANCEL_CURRENT
             )
             val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager?
-            alarmManager!!.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, intent1)
+            alarmManager!!.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+
 
     }
 }

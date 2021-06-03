@@ -3,7 +3,6 @@ package com.example.todo.appwidget
 import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
-import android.util.Log
 import android.widget.AdapterView
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService.RemoteViewsFactory
@@ -43,7 +42,7 @@ class MyWidgetRemoteViewsFactory(private val mContext: Context, intent: Intent?)
         rv.setTextViewText(R.id.widget_title, list[p0].title)
         rv.setTextViewText(R.id.widget_desc, list[p0].description)
         rv.removeAllViews(R.id.container)
-        if (list[p0].checklist!=null && list[p0].checklist!!.size>0){
+        if (list[p0].checklist!=null && list[p0].checklist!!.isNotEmpty()){
             for(checklist in list[p0].checklist!!){
                 val view=RemoteViews(mContext.packageName, R.layout.widget_checklist)
                 view.setTextViewText(R.id.list_item, checklist.task)

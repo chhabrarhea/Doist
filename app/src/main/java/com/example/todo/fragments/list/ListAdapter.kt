@@ -58,7 +58,7 @@ class ListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(),Filterable{
         fun setData(data: List<ToDoData>) {
             this.dataList.clear()
             this.dataList.addAll(data)
-            filter.filter(lastFilter)
+                filter.filter(lastFilter)
 //        notifyDataSetChanged updates the views of all items even if only one item has changed. Performance issues.
 //        notifyDataSetChanged()
         }
@@ -88,7 +88,6 @@ class ListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(),Filterable{
 
         override fun getFilter(): Filter {
             return object : Filter() {
-
                 override fun performFiltering(constraint: CharSequence?): FilterResults {
                     val list: MutableList<ToDoData> = ArrayList()
                     lastFilter = constraint.toString()

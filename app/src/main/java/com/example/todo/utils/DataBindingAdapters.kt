@@ -37,8 +37,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class DataBindingAdapters {
-
-
     companion object {
         private var lastTouchDown: Long = 0
         private const val CLICK_ACTION_THRESHOLD = 200

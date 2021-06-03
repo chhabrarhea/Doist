@@ -47,7 +47,6 @@
       android:layout_width="match_parent"
      android:id="@+id/bottomSheet"
       app:behavior_hideable="false"
-      app:cardCornerRadius="15dp"
       app:cardBackgroundColor="@color/white"
       app:behavior_peekHeight="56dp"
       android:paddingVertical="5dp"

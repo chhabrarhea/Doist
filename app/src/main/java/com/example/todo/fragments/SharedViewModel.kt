@@ -15,7 +15,6 @@ import android.os.Environment
 import android.os.SystemClock
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -61,7 +60,6 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     }
     @Synchronized fun setRecordAudio(path:String){
         audioRecorded.value=path
-        Log.i("onO","$path ${audioRecorded.value}")
     }
 
 
@@ -322,6 +320,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         val binding=RecordDialogBinding.inflate(LayoutInflater.from(context))
         alertDialog.setView(binding.root)
         val alb=alertDialog.create()
+
         binding.recordButton.setOnClickListener {
              if(!isRecording){
                  binding.recordButton.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_stop))
@@ -344,6 +343,13 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
              }
         }
         binding.save.setOnClickListener {
+           if(isRecording)
+           {
+               binding.recordButton.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_baseline_mic_24))
+               binding.timer.stop()
+               recorder!!.stopRecording()
+               isRecording=!isRecording
+           }
             this.setRecordAudio(audioFilePath)
             alb.dismiss()
         }

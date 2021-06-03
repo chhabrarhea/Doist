@@ -52,7 +52,7 @@ class UpdateFragment : Fragment() {
         if (SharedViewModel.audioRecorded.value == "" && mediaPlayerLifeCycle.audioFilePath != "")
             sharedViewModel.setRecordAudio(mediaPlayerLifeCycle.audioFilePath)
         SharedViewModel.audioRecorded.observe(viewLifecycleOwner, {
-            if (it != "") mediaPlayerLifeCycle.initializeMediaPlayer(it)
+            if (it != "") mediaPlayerLifeCycle.setDataSource(it)
         })
 
         if(SharedViewModel.canvasImage.value=="" && args.canvasPath!="")

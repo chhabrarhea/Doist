@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 class MediaPlayerLifeCycle(
     val view: MediaPlayerBinding,
     val context: Context,
-    var audioFilePath: String
+    var audioFilePath: String=""
 ) : SeekBar.OnSeekBarChangeListener, MediaPlayer.OnCompletionListener {
 
     private val seekBar: SeekBar = view.seekBar
@@ -33,6 +33,7 @@ class MediaPlayerLifeCycle(
     private var pause = false
     private var isStarted = false
     private lateinit var anim: Animatable
+    private var isPrepared=false
 
 
     init {
@@ -42,38 +43,20 @@ class MediaPlayerLifeCycle(
     }
 
 
-    private fun initializeSeekBar() {
-        if (mediaPlayer == null)
-            return
-        seekBar.max = mediaPlayer!!.duration/1000
-        tvDue.text = getFormattedDuration(mediaPlayer!!.duration.toLong())
-        runnable = Runnable {
-            seekBar.progress = mediaPlayer!!.currentPosition / 1000
-            tvPass.text = getFormattedDuration(mediaPlayer!!.currentPosition.toLong())
-            handler.postDelayed(runnable!!, 1000)
-        }
-        handler.postDelayed(runnable!!, 1000)
-    }
+
 
     private fun playAndPauseAudio() {
         if (!isStarted) {
             if (mediaPlayer == null)
                 return
-            val file = File(audioFilePath)
-            file.setReadable(true, false)
-            val inputStream = FileInputStream(file)
-            mediaPlayer!!.setDataSource(inputStream.fd)
-            inputStream.close()
-            mediaPlayer!!.prepare()
-            mediaPlayer!!.setOnPreparedListener {
-                initializeSeekBar()
-                anim = playButton.drawable as Animatable
-                anim.start()
-                isStarted = true
-                mediaPlayer?.start()
-            }
+            while (!isPrepared){}
+            anim = playButton.drawable as Animatable
+            anim.start()
+            isStarted = true
+            mediaPlayer?.start()
+            startSeekBar()
+
         }
-        //Pause playing audio
         else if (mediaPlayer!!.isPlaying) {
             mediaPlayer?.pause()
             pause = true
@@ -87,7 +70,6 @@ class MediaPlayerLifeCycle(
             anim.start()
 
         }
-        //Play paused audio
         else {
             playButton.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -101,10 +83,75 @@ class MediaPlayerLifeCycle(
             mediaPlayer?.start()
         }
     }
+    private fun initializeSeekBar() {
+        if (mediaPlayer == null)
+            return
+        tvPass.text=getFormattedDuration(0L)
+        seekBar.progress=0
+        seekBar.max = mediaPlayer!!.duration/1000
+        tvDue.text = getFormattedDuration(mediaPlayer!!.duration.toLong())
+
+    }
+
+    private fun startSeekBar(){
+        runnable = Runnable {
+            seekBar.progress = mediaPlayer!!.currentPosition / 1000
+            tvPass.text = getFormattedDuration(mediaPlayer!!.currentPosition.toLong())
+            handler.postDelayed(runnable!!, 1000)
+        }
+        handler.postDelayed(runnable!!, 1000)
+    }
+
+    private fun initializeMediaPlayer() {
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )}
+            mediaPlayer?.setOnCompletionListener(this)
+
+    }
+    fun setDataSource(file:String){
+        audioFilePath = file
+        isStarted = false
+        isPrepared=false
+        view.root.visibility = View.VISIBLE
+        if(mediaPlayer==null)
+            initializeMediaPlayer()
+        else
+            resetMediaPlayer()
+        playButton.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.avd_play_to_pause
+            )
+        )
+        val file = File(audioFilePath)
+        file.setReadable(true, false)
+        val inputStream = FileInputStream(file)
+        mediaPlayer!!.setDataSource(inputStream.fd)
+        inputStream.close()
+        mediaPlayer!!.prepare()
+        mediaPlayer!!.setOnPreparedListener {
+          initializeSeekBar()
+            isPrepared=true
+        }
+
+    }
+    private fun resetMediaPlayer(){
+        if (mediaPlayer != null) {
+            if (runnable != null)
+                handler.removeCallbacks(runnable!!)
+            mediaPlayer!!.reset()
+        }
+    }
 
     override fun onCompletion(p0: MediaPlayer) {
         playButton.isEnabled = true
         pause = true
+        seekBar.progress=seekBar.max
         playButton.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
@@ -130,22 +177,7 @@ class MediaPlayerLifeCycle(
 
     }
 
-    fun initializeMediaPlayer(file: String) {
-        audioFilePath = file
-        isStarted = false
-        view.root.visibility = View.VISIBLE
-        if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer().apply {
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .build()
-                )
-            }
-            mediaPlayer?.setOnCompletionListener(this)
-        }
-    }
+
 
     fun stopMediaPlayer() {
         if (mediaPlayer != null) {
@@ -173,6 +205,7 @@ class MediaPlayerLifeCycle(
             mediaPlayer = null
         }
     }
+
 
     fun removeMediaPlayer() {
         handler.removeCallbacks(runnable!!)

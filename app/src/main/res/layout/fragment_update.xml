@@ -120,7 +120,7 @@
                     android:visibility="gone"
                     tools:visibility="visible"
                     android:LoadImageWithGlide="@{args.image}">
-                <ImageView
+                <com.example.todo.utils.ZoomImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/image"

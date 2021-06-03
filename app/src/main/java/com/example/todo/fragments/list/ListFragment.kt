@@ -40,8 +40,7 @@ class ListFragment : Fragment(),SearchView.OnQueryTextListener {
         view.sharedVM=sharedViewModel
         setHasOptionsMenu(true)
         (activity as AppCompatActivity?)!!.setSupportActionBar(view.toolbar)
-
-         todoViewModel.getAllData.observe(viewLifecycleOwner, {
+        todoViewModel.getAllData.observe(viewLifecycleOwner, {
              adapter.setData(it)
              sharedViewModel.checkListIsEmpty(it)
          })
