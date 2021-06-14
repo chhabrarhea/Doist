@@ -73,7 +73,7 @@ class UpdateFragment : Fragment() {
         view.deleteCanvas.setOnClickListener { removeCanvasImage() }
         view.currentPrioritiesSpinner.onSpinnerItemSelectedListener = sharedViewModel.initializeSpinner(requireContext(), view.priorityIndicator)
         view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
-        view.reminderLayout.setOnClickListener {sharedViewModel.deleteReminderDialog(requireContext(),view.reminderLayout)}
+        view.reminderLayout.setOnClickListener{inflateCancelReminderDialog()}
 
         return view.root
     }
@@ -269,6 +269,17 @@ class UpdateFragment : Fragment() {
     private fun removeMediaPlayer() {
         mediaPlayerLifeCycle.removeMediaPlayer()
         sharedViewModel.setRecordAudio("")
+    }
+
+    private fun inflateCancelReminderDialog() {
+        val alertDialog=AlertDialog.Builder(requireContext())
+        alertDialog.setTitle("Cancel Reminder?")
+        alertDialog.setPositiveButton("Yes"){_,_->run{
+            view.reminderLayout.visibility=View.GONE
+            todoViewModel.cancelReminder(args.id,requireContext())
+        }}
+        alertDialog.setNegativeButton("No",null)
+        alertDialog.create().show()
     }
 
     override fun onStop() {

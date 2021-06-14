@@ -41,16 +41,20 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
         (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
         binding.prioritiesSpinner.onSpinnerItemSelectedListener = viewModel.initializeSpinnerForCheckList(requireContext(),binding.nameLayout)
         binding.reminderLayout.setOnClickListener {
-            val alertDialog=AlertDialog.Builder(requireContext())
-            alertDialog.setTitle("Cancel Reminder?")
-            alertDialog.setPositiveButton("Yes"){_,_->run{
-               binding.reminderLayout.visibility=View.GONE
-                todoViewModel.deleteReminder(args.id)
-            }}
-            alertDialog.setNegativeButton("No",null)
-            alertDialog.create().show()
+           inflateCancelReminderDialog()
         }
         return binding.root
+    }
+
+    private fun inflateCancelReminderDialog() {
+        val alertDialog=AlertDialog.Builder(requireContext())
+        alertDialog.setTitle("Cancel Reminder?")
+        alertDialog.setPositiveButton("Yes"){_,_->run{
+            binding.reminderLayout.visibility=View.GONE
+            todoViewModel.cancelReminder(args.id,requireContext())
+        }}
+        alertDialog.setNegativeButton("No",null)
+        alertDialog.create().show()
     }
 
     private fun itemClicked() {

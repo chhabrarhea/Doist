@@ -1,10 +1,7 @@
 package com.example.todo.fragments
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Application
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -268,7 +265,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
                                     date=newDate
                                     view.visibility=View.VISIBLE
                                    val tv=view.getChildAt(1) as TextView
-                                    val df=SimpleDateFormat("MMM dd, h:mm a")
+                                    val df=SimpleDateFormat("MMM dd, h:mm a",Locale.getDefault())
                                     dateString=df.format(date!!.time)
                                     tv.text=dateString
                                 } else Toast.makeText(
@@ -304,6 +301,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
             view.visibility=View.GONE
             date=null
             dateString=null
+
         }}
         alertDialog.setNegativeButton("No",null)
         alertDialog.create()

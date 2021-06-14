@@ -72,8 +72,7 @@ class AddFragment : Fragment(){
         view.deleteUrl.setOnClickListener { removeUrl() }
         view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
         view.deleteCanvas.setOnClickListener { removeCanvasImage() }
-        view.reminderLayout.setOnClickListener {sharedViewModel.deleteReminderDialog(requireContext(),view.reminderLayout).show()}
-
+        view.reminderLayout.setOnClickListener {inflateCancelReminderDialog()}
         return view.root
     }
 
@@ -274,6 +273,9 @@ class AddFragment : Fragment(){
         sharedViewModel.setCanvasImage("")
         view.canvasImage.visibility=View.GONE
         view.deleteCanvas.visibility=View.GONE
+    }
+    private fun inflateCancelReminderDialog() {
+        sharedViewModel.deleteReminderDialog(requireContext(),view.reminderLayout)
     }
 
     override fun onStop() {

@@ -81,22 +81,30 @@ class TodoViewModel(application: Application):AndroidViewModel(application) {
     }
     fun deleteReminder(id:Int){
         viewModelScope.launch {
-        repository.deleteReminder(id)}
+        repository.deleteReminder(id)
+        }
+    }
+    fun cancelReminder(id:Int,context: Context){
+        val intent=Intent(getApplication(),NotifierAlarm::class.java)
+        val pi=PendingIntent.getBroadcast(getApplication(),id,intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val am=context.getSystemService(ALARM_SERVICE) as AlarmManager
+        am.cancel(pi)
+        deleteReminder(id)
     }
 
     fun setReminder(toDo: ToDoData, context: Context, date: Calendar){
             val calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"))
             calendar.time = date.time
             calendar.set(Calendar.SECOND, 0)
-            val intent = Intent(context, NotifierAlarm::class.java)
+            val intent = Intent(getApplication(), NotifierAlarm::class.java)
             val todoBundle = Bundle()
             todoBundle.putParcelable("currentItem", toDo)
             intent.putExtra("currentItem", todoBundle)
             val pendingIntent = PendingIntent.getBroadcast(
-                context,
+                getApplication(),
                 toDo.id,
                 intent,
-                PendingIntent.FLAG_CANCEL_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT
             )
             val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager?
             alarmManager!!.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
