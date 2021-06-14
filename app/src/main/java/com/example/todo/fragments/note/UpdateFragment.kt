@@ -244,9 +244,9 @@ class UpdateFragment : Fragment() {
                 title,
                 sharedViewModel.parsePriority(priority.toString()),
                 desc,
-                args.date,
+                view.timeText.text.toString(),reminders.dateString,null,
                 sharedViewModel.mCurrentPhotoPath,
-                mediaPlayerLifeCycle.audioFilePath, noteUrl, null,canvasPath,reminders.dateString
+                mediaPlayerLifeCycle.audioFilePath, noteUrl,canvasPath
             )
             todoViewModel.updateData(newData, requireContext(),reminders.date)
             sharedViewModel.deinitializeSharedVariables()

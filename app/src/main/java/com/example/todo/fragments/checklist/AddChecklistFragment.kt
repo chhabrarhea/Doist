@@ -113,10 +113,8 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
                 viewModel.parsePriority(binding.prioritiesSpinner.selectedItem.toString()),
                 "",
                 date,
-                "",
-                "",
-                "",
-                adapter.listTask,"",reminders.dateString)
+                reminders.dateString,
+                adapter.listTask)
                 todoViewModel.insertData(todo,requireContext(),reminders.date)
             Toast.makeText(requireContext(),"Successfully added ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_addChecklistFragment_to_listFragment)

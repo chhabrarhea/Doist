@@ -7,15 +7,12 @@ import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.os.Message
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.todo.NewAppWidget
 import com.example.todo.NotifierAlarm
 import com.example.todo.data.Repository.ToDoRepository
-import com.example.todo.data.models.CheckListTask
-import com.example.todo.data.models.Priority
 import com.example.todo.data.models.ToDoData
 import kotlinx.coroutines.launch
 import java.util.*
@@ -64,21 +61,7 @@ class TodoViewModel(application: Application):AndroidViewModel(application) {
             NewAppWidget().sendRefreshBroadcast(context)
         }
     }
-    fun saveData(
-        title: String,
-        priority: Priority,
-        date: String,
-        list: List<CheckListTask>,
-        reminder:String?,
-        context: Context
-    ){
-        val task= ToDoData(0, title, priority, "", date, "", "", "", list, "",reminder)
-        viewModelScope.launch {
-            repository.insertTodo(task)
-            NewAppWidget().sendRefreshBroadcast(context)
-        }
 
-    }
     fun deleteReminder(id:Int){
         viewModelScope.launch {
         repository.deleteReminder(id)

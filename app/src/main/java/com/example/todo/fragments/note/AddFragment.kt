@@ -187,9 +187,9 @@ class AddFragment : Fragment(){
                 title,
                 sharedViewModel.parsePriorityById(priority),
                 desc,
-                view.timeText.text.toString(),
+                view.timeText.text.toString(),reminders.dateString,null,
                 sharedViewModel.mCurrentPhotoPath, mediaPlayerLifeCycle.audioFilePath,
-                view.urlText.text.toString(), null, canvasPath,reminders.dateString
+                view.urlText.text.toString(), canvasPath,
             )
                 todoViewModel.insertData(newData,requireContext(),reminders.date)
                 sharedViewModel.deinitializeSharedVariables()

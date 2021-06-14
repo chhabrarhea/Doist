@@ -14,10 +14,11 @@ data class ToDoData(
     var priority: Priority,
     var description:String,
     var date: String,
-    var image:String,
-    var voicenote:String,
-    var url:String,
-    var checklist: List<CheckListTask>?,
-    var canvasPath:String,
-    var reminder:String?
+    var reminder:String?=null,
+    var checklist: List<CheckListTask>?=null,
+    var image:String="",
+    var voicenote:String="",
+    var url:String="",
+    var canvasPath:String=""
+
 ): Parcelable
