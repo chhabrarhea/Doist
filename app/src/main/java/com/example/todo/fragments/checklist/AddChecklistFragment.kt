@@ -16,6 +16,7 @@ import com.example.todo.data.models.CheckListTask
 import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentAddChecklistBinding
 import com.example.todo.fragments.SharedViewModel
+import com.example.todo.utils.Reminders
 
 class AddChecklistFragment : Fragment(), View.OnTouchListener {
     private lateinit var binding: FragmentAddChecklistBinding
@@ -23,13 +24,21 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
     private var date=""
     private val todoViewModel: TodoViewModel by viewModels()
     private val viewModel: SharedViewModel by viewModels()
+    private lateinit var reminders: Reminders
 
 
-    @SuppressLint("ClickableViewAccessibility")
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentAddChecklistBinding.inflate(layoutInflater, container, false)
+        reminders= Reminders(requireContext(),binding.reminderLayout)
+        initializeUI()
+        return binding.root
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initializeUI() {
         adapter = CheckListAdapter(ArrayList()){itemClicked() }
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -40,7 +49,6 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
         binding.prioritiesSpinner.onSpinnerItemSelectedListener=viewModel.initializeSpinnerForCheckList(requireContext(),binding.nameLayout)
 
         binding.reminderLayout.setOnClickListener {deleteReminder()}
-        return binding.root
     }
 
     private fun deleteReminder() {
@@ -48,8 +56,7 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
         alertDialog.setTitle("Cancel Reminder?")
         alertDialog.setPositiveButton("Yes"){_,_->run{
             binding.reminderLayout.visibility=View.GONE
-            viewModel.dateString=null
-            viewModel.date=null
+           reminders.cancelReminder()
         }}
         alertDialog.setNegativeButton("No",null)
         alertDialog.create().show()
@@ -87,7 +94,7 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.menu_save->saveData()
-            R.id.reminder->viewModel.setReminder(requireContext(),binding.reminderLayout)
+            R.id.reminder->reminders.setReminder()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -95,7 +102,7 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
     private fun saveData() {
         if(binding.titleEt.text.toString().isEmpty() || adapter.listTask.size==0)
             Toast.makeText(requireContext(),"Some required fields are empty!",Toast.LENGTH_SHORT).show()
-        else if(viewModel.date!=null && viewModel.date!!.timeInMillis<System.currentTimeMillis()){
+        else if(!reminders.validateTime()){
             Toast.makeText(requireContext(), "Set a later time for reminder!", Toast.LENGTH_SHORT)
                 .show()
         }
@@ -109,8 +116,8 @@ class AddChecklistFragment : Fragment(), View.OnTouchListener {
                 "",
                 "",
                 "",
-                adapter.listTask,"",viewModel.dateString)
-                todoViewModel.insertData(todo,requireContext(),viewModel.date)
+                adapter.listTask,"",reminders.dateString)
+                todoViewModel.insertData(todo,requireContext(),reminders.date)
             Toast.makeText(requireContext(),"Successfully added ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_addChecklistFragment_to_listFragment)
             }

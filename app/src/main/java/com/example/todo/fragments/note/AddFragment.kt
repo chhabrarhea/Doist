@@ -22,6 +22,7 @@ import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentAddBinding
 import com.example.todo.utils.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
+import com.example.todo.utils.Reminders
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.reflect.Method
 
@@ -32,6 +33,7 @@ class AddFragment : Fragment(){
     private val sharedViewModel: SharedViewModel by viewModels()
     private lateinit var mediaPlayerLifeCycle: MediaPlayerLifeCycle
     private var canvasPath:String=""
+    private lateinit var reminders: Reminders
 
 
     override fun onCreateView(
@@ -40,7 +42,14 @@ class AddFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View {
         view = FragmentAddBinding.inflate(inflater, container, false)
+        reminders= Reminders(requireContext(),view.reminderLayout)
+        initializeUI()
+        subscribeToObservers()
+        setOnClickListeners()
+        return view.root
+    }
 
+    private fun initializeUI() {
         setHasOptionsMenu(true)
         (activity as AppCompatActivity?)!!.setSupportActionBar(view.toolbar)
         view.toolbar.overflowIcon= ContextCompat.getDrawable(
@@ -52,7 +61,8 @@ class AddFragment : Fragment(){
             requireContext(),
             view.priorityIndicator
         )
-
+    }
+    private fun subscribeToObservers() {
         mediaPlayerLifeCycle= MediaPlayerLifeCycle(view.mediaPlayer, requireContext())
         if(mediaPlayerLifeCycle.audioFilePath!="" && SharedViewModel.audioRecorded.value=="")
             sharedViewModel.setRecordAudio("")
@@ -67,13 +77,13 @@ class AddFragment : Fragment(){
                 setImage(it, view.canvasImage, view.deleteCanvas)
             }
         })
-
+    }
+    private fun setOnClickListeners() {
         view.deleteImage.setOnClickListener { removeImage() }
         view.deleteUrl.setOnClickListener { removeUrl() }
         view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
         view.deleteCanvas.setOnClickListener { removeCanvasImage() }
-        view.reminderLayout.setOnClickListener {inflateCancelReminderDialog()}
-        return view.root
+        view.reminderLayout.setOnClickListener {reminders.deleteUnsavedReminderDialog()}
     }
 
     //sets Image in imageView using Glide
@@ -171,7 +181,7 @@ class AddFragment : Fragment(){
         val priority = view.prioritiesSpinner.selectedIndex
         val desc = view.descriptionEt.text.toString()
 
-        if (sharedViewModel.validateData(title, desc) && (sharedViewModel.date==null || sharedViewModel.date!!.timeInMillis>System.currentTimeMillis())) {
+        if (sharedViewModel.validateData(title, desc) && reminders.validateTime()) {
             val newData = ToDoData(
                 0,
                 title,
@@ -179,13 +189,13 @@ class AddFragment : Fragment(){
                 desc,
                 view.timeText.text.toString(),
                 sharedViewModel.mCurrentPhotoPath, mediaPlayerLifeCycle.audioFilePath,
-                view.urlText.text.toString(), null, canvasPath,sharedViewModel.dateString
+                view.urlText.text.toString(), null, canvasPath,reminders.dateString
             )
-                todoViewModel.insertData(newData,requireContext(),sharedViewModel.date)
+                todoViewModel.insertData(newData,requireContext(),reminders.date)
                 sharedViewModel.deinitializeSharedVariables()
             Toast.makeText(requireContext(), "Added Successfully!", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_addFragment_to_listFragment)
-        }else if (sharedViewModel.date!=null && sharedViewModel.date!!.timeInMillis<System.currentTimeMillis())
+        }else if (!reminders.validateTime())
             Toast.makeText(requireContext(), "Please enter a later time for reminder!", Toast.LENGTH_LONG).show()
         else {
             Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
@@ -215,7 +225,7 @@ class AddFragment : Fragment(){
             R.id.add_url -> sharedViewModel.urlDialog(requireContext(), layoutInflater, view.url).show()
             R.id.menu_add_vn -> addVn()
             R.id.canvas -> findNavController().navigate(R.id.action_addFragment_to_drawFragment)
-            R.id.reminder -> sharedViewModel.setReminder(requireContext(),view.reminderLayout)
+            R.id.reminder -> reminders.setReminder()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -274,9 +284,7 @@ class AddFragment : Fragment(){
         view.canvasImage.visibility=View.GONE
         view.deleteCanvas.visibility=View.GONE
     }
-    private fun inflateCancelReminderDialog() {
-        sharedViewModel.deleteReminderDialog(requireContext(),view.reminderLayout)
-    }
+
 
     override fun onStop() {
         super.onStop()

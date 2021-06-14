@@ -22,6 +22,7 @@ import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentUpdateBinding
 import com.example.todo.utils.MediaPlayerLifeCycle
 import com.example.todo.fragments.SharedViewModel
+import com.example.todo.utils.Reminders
 import java.lang.reflect.Method
 
 class UpdateFragment : Fragment() {
@@ -34,6 +35,7 @@ class UpdateFragment : Fragment() {
     private lateinit var uri: Uri
     private lateinit var mediaPlayerLifeCycle: MediaPlayerLifeCycle
     private var canvasPath=""
+    private lateinit var reminders: Reminders
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,8 +48,29 @@ class UpdateFragment : Fragment() {
         args = requireArguments().getParcelable("currentItem")!!
         view.lifecycleOwner = this
         view.args = args
+        (activity as AppCompatActivity?)!!.setSupportActionBar(view.toolbar)
+        view.toolbar.overflowIcon =
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_attach_file_24)
+
+        reminders= Reminders(requireContext(),view.reminderLayout)
+        subscribeToObservers()
+        setOnClickListeners()
 
 
+
+        return view.root
+    }
+
+    private fun setOnClickListeners() {
+        view.deleteImage.setOnClickListener { removeImage() }
+        view.deleteUrl.setOnClickListener { removeUrl() }
+        view.deleteCanvas.setOnClickListener { removeCanvasImage() }
+        view.currentPrioritiesSpinner.onSpinnerItemSelectedListener = sharedViewModel.initializeSpinner(requireContext(), view.priorityIndicator)
+        view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
+        view.reminderLayout.setOnClickListener{inflateCancelReminderDialog()}
+    }
+
+    private fun subscribeToObservers() {
         mediaPlayerLifeCycle = MediaPlayerLifeCycle(view.mediaPlayer, requireContext(), args.voicenote)
         if (SharedViewModel.audioRecorded.value == "" && mediaPlayerLifeCycle.audioFilePath != "")
             sharedViewModel.setRecordAudio(mediaPlayerLifeCycle.audioFilePath)
@@ -64,18 +87,7 @@ class UpdateFragment : Fragment() {
             } })
 
         sharedViewModel.mCurrentPhotoPath = args.image
-        (activity as AppCompatActivity?)!!.setSupportActionBar(view.toolbar)
-        view.toolbar.overflowIcon =
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_attach_file_24)
 
-        view.deleteImage.setOnClickListener { removeImage() }
-        view.deleteUrl.setOnClickListener { removeUrl() }
-        view.deleteCanvas.setOnClickListener { removeCanvasImage() }
-        view.currentPrioritiesSpinner.onSpinnerItemSelectedListener = sharedViewModel.initializeSpinner(requireContext(), view.priorityIndicator)
-        view.mediaPlayer.deleteAudio.setOnClickListener { removeMediaPlayer() }
-        view.reminderLayout.setOnClickListener{inflateCancelReminderDialog()}
-
-        return view.root
     }
 
     private fun addImage() {
@@ -200,7 +212,7 @@ class UpdateFragment : Fragment() {
             R.id.add_url -> sharedViewModel.urlDialog(requireContext(), layoutInflater, view.urlRoot).show()
             R.id.menu_add_vn -> addVn()
             R.id.canvas->findNavController().navigate(R.id.action_updateFragment_to_drawFragment)
-            R.id.reminder->sharedViewModel.setReminder(requireContext(),view.reminderLayout)
+            R.id.reminder->reminders.setReminder()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -226,7 +238,7 @@ class UpdateFragment : Fragment() {
         val title = view.currentTitleEt.text.toString()
         val priority = view.currentPrioritiesSpinner.selectedItem
         val desc = view.currentDescriptionEt.text.toString()
-        if (sharedViewModel.validateData(title, desc) && (sharedViewModel.date==null || sharedViewModel.date!!.timeInMillis>System.currentTimeMillis())) {
+        if (sharedViewModel.validateData(title, desc) && reminders.validateTime()) {
             val newData = ToDoData(
                 args.id,
                 title,
@@ -234,13 +246,13 @@ class UpdateFragment : Fragment() {
                 desc,
                 args.date,
                 sharedViewModel.mCurrentPhotoPath,
-                mediaPlayerLifeCycle.audioFilePath, noteUrl, null,canvasPath,sharedViewModel.dateString
+                mediaPlayerLifeCycle.audioFilePath, noteUrl, null,canvasPath,reminders.dateString
             )
-            todoViewModel.updateData(newData, requireContext(),sharedViewModel.date)
+            todoViewModel.updateData(newData, requireContext(),reminders.date)
             sharedViewModel.deinitializeSharedVariables()
             Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_updateFragment_to_listFragment)
-        }else if(sharedViewModel.date!=null && sharedViewModel.date!!.timeInMillis<=System.currentTimeMillis())
+        }else if(!reminders.validateTime())
             Toast.makeText(requireContext(), "Please set a later time for reminder!", Toast.LENGTH_SHORT).show()
         else {
             Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
@@ -276,6 +288,7 @@ class UpdateFragment : Fragment() {
         alertDialog.setTitle("Cancel Reminder?")
         alertDialog.setPositiveButton("Yes"){_,_->run{
             view.reminderLayout.visibility=View.GONE
+            reminders.cancelReminder()
             todoViewModel.cancelReminder(args.id,requireContext())
         }}
         alertDialog.setNegativeButton("No",null)

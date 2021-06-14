@@ -42,8 +42,7 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     var listIsEmpty = MutableLiveData<Boolean>()
     var mCurrentPhotoPath = ""
     val fromCamera = 200
-    var date:Calendar?=null
-    var dateString:String?=null
+
 
     //data shared by fragments- audio path and canvas path
     companion object{
@@ -247,66 +246,15 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         return cursor.getString(column_index)
     }
     
-    fun setReminder(context: Context,view:RelativeLayout){
-        val newCalender = Calendar.getInstance();
-        val datePicker= DatePickerDialog(
-            context,
-            { _, year, month, day ->
-                run {
-                    val newDate = Calendar.getInstance()
-                    val newTime = Calendar.getInstance()
-                    val time = TimePickerDialog(
-                        context,
-                        { _, hour, min ->
-                            run {
-                                newDate.set(year, month, day, hour, min)
-                                val tem = Calendar.getInstance()
-                                if (newDate.timeInMillis - tem.timeInMillis > 0) {
-                                    date=newDate
-                                    view.visibility=View.VISIBLE
-                                   val tv=view.getChildAt(1) as TextView
-                                    val df=SimpleDateFormat("MMM dd, h:mm a",Locale.getDefault())
-                                    dateString=df.format(date!!.time)
-                                    tv.text=dateString
-                                } else Toast.makeText(
-                                    context,
-                                    "Invalid time",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }, newTime.get(Calendar.HOUR_OF_DAY), newTime.get(Calendar.MINUTE), true
-                    )
-                    time.show()
-                }
 
-            }, newCalender.get(Calendar.YEAR), newCalender.get(Calendar.MONTH), newCalender.get(
-                Calendar.DAY_OF_MONTH
-            )
-        )
-        datePicker.datePicker.minDate = System.currentTimeMillis()
-        datePicker.show()
-    }
 
     fun deinitializeSharedVariables(){
         canvasImage.value=""
         audioRecorded.value=""
-        date=null
-        dateString=null
+
     }
 
-    fun deleteReminderDialog(context: Context,view:RelativeLayout):AlertDialog.Builder{
-        val alertDialog=AlertDialog.Builder(context)
-        alertDialog.setTitle("Cancel Reminder?")
-        alertDialog.setPositiveButton("Yes"){_,_->run{
-            view.visibility=View.GONE
-            date=null
-            dateString=null
 
-        }}
-        alertDialog.setNegativeButton("No",null)
-        alertDialog.create()
-        return alertDialog
-    }
 
     fun inflateRecordDialog(context: Context):AlertDialog{
         val file = File(context.getExternalFilesDir(null)?.absolutePath, "Doist")

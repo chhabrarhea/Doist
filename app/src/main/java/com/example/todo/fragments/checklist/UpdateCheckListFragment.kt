@@ -16,6 +16,7 @@ import com.example.todo.data.models.CheckListTask
 import com.example.todo.data.models.ToDoData
 import com.example.todo.databinding.FragmentUpdateCheckListBinding
 import com.example.todo.fragments.SharedViewModel
+import com.example.todo.utils.Reminders
 import kotlin.collections.ArrayList
 
 
@@ -25,7 +26,8 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
     private lateinit var adapter: CheckListAdapter
     private val todoViewModel: TodoViewModel by viewModels()
     private val viewModel: SharedViewModel by viewModels()
-    @SuppressLint("ClickableViewAccessibility")
+    private lateinit var reminders: Reminders
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,17 +35,24 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
         binding = FragmentUpdateCheckListBinding.inflate(inflater, container, false)
         args = requireArguments().getParcelable("currentList")!!
         binding.args = args
+        binding.lifecycleOwner=this
+        reminders= Reminders(requireContext(),binding.reminderLayout)
+        initializeUI()
+        return binding.root
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initializeUI(){
+        setHasOptionsMenu(true)
+        (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
         adapter = CheckListAdapter(ArrayList(args.checklist)) { itemClicked() }
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.task.setOnTouchListener(this)
-        setHasOptionsMenu(true)
-        (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
         binding.prioritiesSpinner.onSpinnerItemSelectedListener = viewModel.initializeSpinnerForCheckList(requireContext(),binding.nameLayout)
         binding.reminderLayout.setOnClickListener {
-           inflateCancelReminderDialog()
+            inflateCancelReminderDialog()
         }
-        return binding.root
     }
 
     private fun inflateCancelReminderDialog() {
@@ -51,6 +60,7 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
         alertDialog.setTitle("Cancel Reminder?")
         alertDialog.setPositiveButton("Yes"){_,_->run{
             binding.reminderLayout.visibility=View.GONE
+            reminders.cancelReminder()
             todoViewModel.cancelReminder(args.id,requireContext())
         }}
         alertDialog.setNegativeButton("No",null)
@@ -58,7 +68,7 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
     }
 
     private fun itemClicked() {
-
+        //purposely left empty
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -90,7 +100,7 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
         when (item.itemId) {
             R.id.menu_save -> saveData()
             R.id.menu_delete->deleteData()
-            R.id.reminder->viewModel.setReminder(requireContext(),binding.reminderLayout)
+            R.id.reminder->reminders.setReminder()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -104,7 +114,7 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
         if (binding.titleEt.text.toString().isEmpty() || adapter.listTask.size == 0)
             Toast.makeText(requireContext(), "Some required fields are empty!", Toast.LENGTH_SHORT)
                 .show()
-        else if(viewModel.date!=null && viewModel.date!!.timeInMillis<System.currentTimeMillis()){
+        else if(!reminders.validateTime()){
             Toast.makeText(requireContext(), "Set a later time for reminder!", Toast.LENGTH_SHORT)
                 .show()
         }
@@ -118,8 +128,9 @@ class UpdateCheckListFragment : Fragment(),View.OnTouchListener{
                     "",
                     "",
                     "",
-                    adapter.listTask,"",viewModel.dateString)
-                todoViewModel.updateData(todo,requireContext(),viewModel.date)
+                    adapter.listTask,"",reminders.dateString)
+                viewModel.deinitializeSharedVariables()
+                todoViewModel.updateData(todo,requireContext(),reminders.date)
             Toast.makeText(requireContext(),"Successfully updated ${binding.titleEt.text}!",Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_updateCheckListFragment_to_listFragment)
         }
